@@ -1,75 +1,197 @@
-# reader
+# Reader Server
 
-阅读3服务器版，不需要手机。
+[한국어](#한국어) | [English](#english)
 
-加入TG群(限时开放) 👉 [https://t.me/+pQ8HDlANPZ84ZWNl](https://t.me/+pQ8HDlANPZ84ZWNl)
+Reader Server is a self-hosted web reader based on the open-source Reader/Legado ecosystem. This fork adds multilingual UI support and Docker packaging for easier NAS deployment.
 
-关注公众号，查看教程和书源👇
+Supported UI languages:
 
-![](imgs/mpcode.png)
+- English (default)
+- Korean
+- Chinese
 
+The selected language is stored in the browser and can be changed from the app settings.
 
-> 注意❗️
+> Source notice
 >
-> Reader 完整源码仅开放到 v2.5.4，新版本当前仅开放部分开源源码，见 https://github.com/hectorqin/reader-legado.
+> This project is based on the Reader server codebase. The original upstream project only fully opened source code up to v2.5.4. Newer upstream code may be partially open-source. See <https://github.com/hectorqin/reader-legado>.
 
-<details><summary>免责声明（Disclaimer）</summary>
-阅读是一款提供网络文学搜索的工具，为广大网络文学爱好者提供一种方便、快捷舒适的试读体验。
+## 한국어
 
-当您搜索一本书的时，阅读会将该书的书名以关键词的形式提交到各个第三方网络文学网站。各第三方网站返回的内容与阅读无关，阅读对其概不负责，亦不承担任何法律责任。任何通过使用阅读而链接到的第三方网页均系他人制作或提供，您可能从第三方网页上获得其他服务，阅读对其合法性概不负责，亦不承担任何法律责任。第三方搜索引擎结果根据您提交的书名自动搜索获得并提供试读，不代表阅读赞成或被搜索链接到的第三方网页上的内容或立场。您应该对使用搜索引擎的结果自行承担风险。
+### 개요
 
-阅读不做任何形式的保证：不保证第三方搜索引擎的搜索结果满足您的要求，不保证搜索服务不中断，不保证搜索结果的安全性、正确性、及时性、合法性。因网络状况、通讯线路、第三方网站等任何原因而导致您不能正常使用阅读，阅读不承担任何法律责任。阅读尊重并保护所有使用阅读用户的个人隐私权，您注册的用户名、电子邮件地址等个人资料，非经您亲自许可或根据相关法律、法规的强制性规定，阅读不会主动地泄露给第三方。
+이 프로젝트는 휴대폰 없이 서버에서 실행하는 웹 기반 독서 서비스입니다. 책 소스 관리, 책장, 검색, 로컬 책 가져오기, WebDAV 동기화 등을 웹 UI에서 사용할 수 있습니다.
 
-阅读致力于最大程度地减少网络文学阅读者在自行搜寻过程中的无意义的时间浪费，通过专业搜索展示不同网站中网络文学的最新章节。阅读在为广大小说爱好者提供方便、快捷舒适的试读体验的同时，也使优秀网络文学得以迅速、更广泛的传播，从而达到了在一定程度促进网络文学充分繁荣发展之目的。阅读鼓励广大小说爱好者通过阅读发现优秀网络小说及其提供商，并建议阅读正版图书。任何单位或个人认为通过阅读搜索链接到的第三方网页内容可能涉嫌侵犯其信息网络传播权，应该及时向阅读提出书面权力通知，并提供身份证明、权属证明及详细侵权情况证明。阅读在收到上述法律文件后，将会依法尽快断开相关链接内容。
-</details>
+현재 이 포크에서는 다음을 정리했습니다.
 
-<details><summary>功能说明</summary>
-  书源管理 <br/>
-- 书架管理 <br/>
-- 书架布局 <br/>
-- 搜索 <br/>
-- 书海 <br/>
-- 看书 <br/>
-- 移动端适配 <br/>
-- 换源 <br/>
-- 翻页方式 <br/>
-- 手势支持 <br/>
-- 自定义主题 <br/>
-- 自定义样式 <br/>
-- WebDAV同步 <br/>
-- 文字替换过滤 <br/>
-- 听书<仅部分浏览器支持，手机端会因为锁屏而失效> <br/>
-- 用户配置备份恢复 <br/>
-- 支持漫画 <br/>
-- 支持音频 <br/>
-- 书源失效检测 <br/>
-- 导入本地TXT、EPUB、UMD、PDF格式的书籍 <br/>
-- 书籍分组 <br/>
-- RSS订阅 <br/>
-- 定时更新书架 <br/>
-- 并发搜书 <br/>
-- 本地书仓 <br/>
-- 支持kindle阅读 <br/>
-</details>
+- 한국어/영어/중국어 언어팩 구조
+- 기본 언어 영어 설정
+- 환경설정에서 언어 전환
+- Element UI 기본 문구 다국어 처리
+- 일부 백엔드 중국어 오류 메시지의 프론트엔드 번역 처리
+- UGREEN NAS용 Docker 배포 파일
 
-## 下载与安装
+### 주요 기능
 
-详见[文档](https://github.com/hectorqin/reader/blob/master/doc.md)
+- 책 소스 관리
+- 책장 관리 및 책 그룹
+- 검색, 책 바다, 책 소스 전환
+- 읽기 화면, 테마, 글꼴, 페이지 넘김 방식, 제스처
+- 모바일 화면 대응
+- WebDAV 동기화
+- 사용자 설정 백업/복원
+- 텍스트 치환/필터
+- TTS 읽어주기 일부 지원
+- 만화/오디오 일부 지원
+- 로컬 TXT, EPUB, UMD, PDF 책 가져오기
+- RSS 구독
+- 책장 예약 업데이트
+- 동시 검색
+- 로컬 책 창고
+- Kindle용 단순 웹 화면
 
-## 问题
+### 설치 및 실행
 
-- 部分使用了 `Javascript` 的书源可能会报错，如调用原生java等高级Javascript功能
-- `webview` 功能需要另外部署接口，不支持 `sourceRegex` 匹配资源响应
-- 不支持书源登录功能
+Docker Desktop이 있는 PC에서 이미지를 만들 수 있습니다.
 
-## 感谢
+```bash
+docker build -t reader-ko:latest .
+docker save -o reader-ko.tar reader-ko:latest
+```
 
-- 项目初期参考了 [lightink-小说API](https://github.com/lightink-qingmo/lightink-server)
-- [阅读](https://github.com/gedoor/MyBookshelf)
-- [阅读3.0](https://github.com/gedoor/legado)
-- 项目初期参考了 [阅读3.0Web端](https://github.com/celetor/web-yuedu3)
+UGREEN NAS 배포 방법은 [UGREEN_DOCKER.md](UGREEN_DOCKER.md)를 참고하세요.
 
-## 其它
+직접 빌드해서 실행하려면:
 
-- [帮助文档](https://github.com/hectorqin/reader/blob/master/doc.md)
-- [界面预览](https://github.com/hectorqin/reader/blob/master/preview.md)
+```bash
+docker compose -f docker-compose.ugreen.yml up -d --build
+```
+
+이미지 tar를 NAS에 가져온 뒤 실행하려면:
+
+```bash
+docker load -i reader-ko.tar
+docker compose -f docker-compose.ugreen-image.yml up -d
+```
+
+접속 주소:
+
+```text
+http://NAS_IP:4396
+```
+
+### 언어 설정
+
+앱의 환경설정에서 언어를 선택할 수 있습니다.
+
+- English
+- 한국어
+- 중국어
+
+기본값은 영어입니다. 이미 브라우저에 저장된 언어 설정이 있으면 저장된 값이 우선 적용됩니다.
+
+### 주의 사항
+
+- 책 소스에 따라 외부 웹사이트로 검색 요청이 나갈 수 있습니다. 이는 책 검색/목차/본문 가져오기 기능의 특성입니다.
+- 로컬 책, 책장 데이터, 설정 파일은 설정한 storage 경로에 저장됩니다.
+- WebView 기반 책 소스는 별도 WebView 서비스가 필요할 수 있습니다.
+- 일부 JavaScript 고급 기능을 쓰는 책 소스는 서버 환경에서 동작하지 않을 수 있습니다.
+- 책 소스 로그인 기능은 지원하지 않습니다.
+
+### 참고 문서
+
+- [UGREEN NAS Docker 배포](UGREEN_DOCKER.md)
+- [원본 상세 문서](doc.md)
+- [화면 미리보기](preview.md)
+
+## English
+
+### Overview
+
+This project runs a web-based reader service on a server, without requiring a phone client. It provides book source management, bookshelf management, search, local book import, WebDAV sync, and reader settings through a browser UI.
+
+This fork adds:
+
+- Korean, English, and Chinese locale packs
+- English as the default language
+- Language switching from settings
+- Localized Element UI built-in messages
+- Frontend translations for common backend Chinese error messages
+- Docker deployment files for UGREEN NAS
+
+### Features
+
+- Book source management
+- Bookshelf and book group management
+- Search, discovery, and source switching
+- Reader page, themes, fonts, page-turn modes, and gestures
+- Mobile-friendly layout
+- WebDAV sync
+- User configuration backup and restore
+- Text replacement/filtering
+- Partial TTS support
+- Partial comic/audio support
+- Local TXT, EPUB, UMD, and PDF import
+- RSS subscriptions
+- Scheduled bookshelf updates
+- Concurrent search
+- Local book store
+- Simple Kindle-friendly web view
+
+### Install And Run
+
+Build the Docker image on a PC with Docker Desktop:
+
+```bash
+docker build -t reader-ko:latest .
+docker save -o reader-ko.tar reader-ko:latest
+```
+
+For UGREEN NAS deployment, see [UGREEN_DOCKER.md](UGREEN_DOCKER.md).
+
+To build directly from source:
+
+```bash
+docker compose -f docker-compose.ugreen.yml up -d --build
+```
+
+To run from an imported image tar:
+
+```bash
+docker load -i reader-ko.tar
+docker compose -f docker-compose.ugreen-image.yml up -d
+```
+
+Open:
+
+```text
+http://NAS_IP:4396
+```
+
+### Language Settings
+
+The language can be changed from the app settings.
+
+- English
+- Korean
+- Chinese
+
+English is the default. If the browser already has a saved language value, the saved value is used first.
+
+### Notes
+
+- Book source search may send requests to third-party websites. This is part of search, TOC, and content fetching behavior.
+- Local books, bookshelf data, and settings are stored under the configured storage path.
+- WebView-based book sources may require a separate WebView service.
+- Some book sources using advanced JavaScript features may not work in the server runtime.
+- Book source login is not supported.
+
+### References
+
+- [UGREEN NAS Docker Deployment](UGREEN_DOCKER.md)
+- [Original Detailed Documentation](doc.md)
+- [Preview](preview.md)
+
+## Disclaimer
+
+This software is a reading/search tool. Search results and content are provided by third-party book sources or websites. The project is not responsible for third-party content, legality, availability, accuracy, or service quality. Use book sources responsibly and follow the laws and copyright rules that apply in your region.
