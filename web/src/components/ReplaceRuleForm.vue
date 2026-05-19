@@ -1,6 +1,6 @@
-<template>
+﻿<template>
   <el-dialog
-    title="替换规则"
+    :title="$t('replaceRule.title')"
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -12,24 +12,32 @@
     :before-close="cancel"
   >
     <el-form :model="ruleForm">
-      <el-form-item label="名称">
+      <el-form-item :label="$t('replaceRule.name')">
         <el-input v-model="ruleForm.name"></el-input>
       </el-form-item>
-      <el-form-item label="规则">
+      <el-form-item :label="$t('replaceRule.rule')">
         <el-input v-model="ruleForm.pattern"></el-input>
       </el-form-item>
-      <el-form-item label="替换为">
+      <el-form-item :label="$t('replaceRule.replacement')">
         <el-input v-model="ruleForm.replacement"></el-input>
       </el-form-item>
-      <el-form-item label="替换范围">
+      <el-form-item :label="$t('replaceRule.scope')">
         <el-input v-model="ruleForm.scope"></el-input>
       </el-form-item>
-      <el-checkbox v-model="ruleForm.isRegex">使用正则表达式</el-checkbox>
-      <el-checkbox v-model="ruleForm.isEnabled">是否启用</el-checkbox>
+      <el-checkbox v-model="ruleForm.isRegex">{{
+        $t("replaceRule.useRegex")
+      }}</el-checkbox>
+      <el-checkbox v-model="ruleForm.isEnabled">{{
+        $t("replaceRule.enabled")
+      }}</el-checkbox>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button size="medium" @click="cancel">取 消</el-button>
-      <el-button size="medium" type="primary" @click="save">确 定</el-button>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
+      <el-button size="medium" type="primary" @click="save">{{
+        $t("common.confirm")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -67,24 +75,23 @@ export default {
     },
     save() {
       if (!this.ruleForm.name) {
-        this.$message.error("规则名不能为空");
+        this.$message.error(this.$t("replaceRule.nameRequired"));
         return;
       }
       if (!this.ruleForm.pattern) {
-        this.$message.error("规则不能为空");
+        this.$message.error(this.$t("replaceRule.ruleRequired"));
         return;
       }
       if (!this.ruleForm.scope) {
-        this.$message.error("替换范围不能为空");
+        this.$message.error(this.$t("replaceRule.scopeRequired"));
         return;
       }
       if (this.isAdd) {
-        // 判断 name 是否唯一
         const isExisted = this.$store.state.filterRules.find(
           v => v.name === this.ruleForm.name
         );
         if (isExisted) {
-          this.$message.error("规则名不能重复");
+          this.$message.error(this.$t("replaceRule.nameDuplicate"));
           return;
         }
       }
@@ -94,7 +101,11 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.$message.success(
-              (this.isAdd ? "新增" : "编辑") + "替换规则成功"
+              this.$t(
+                this.isAdd
+                  ? "replaceRule.addSuccess"
+                  : "replaceRule.editSuccess"
+              )
             );
             this.$root.$children[0].loadReplaceRules(true);
             this.cancel();
@@ -102,9 +113,12 @@ export default {
         },
         error => {
           this.$message.error(
-            (this.isAdd ? "新增" : "编辑") +
-              "替换规则失败 " +
-              (error && error.toString())
+            this.$t(
+              this.isAdd ? "replaceRule.addFailed" : "replaceRule.editFailed",
+              {
+                message: error && error.toString()
+              }
+            )
           );
         }
       );

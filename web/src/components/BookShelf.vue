@@ -1,12 +1,11 @@
-<template>
+﻿<template>
   <div class="popup-wrapper" :style="popupTheme">
     <div class="title-zone">
-      <div class="title">书架({{ shelfBooks.length }})</div>
+      <div class="title">{{ $t("reader.shelf") }}({{ shelfBooks.length }})</div>
       <div :class="{ 'title-btn': true, loading: refreshLoading }">
-        <!-- <span class="home-btn" @click="backToHome">回首页</span> -->
         <span :class="{ loading: refreshLoading }" @click="refreshShelf">
           <i class="el-icon-loading" v-if="refreshLoading"></i>
-          {{ refreshLoading ? "刷新中..." : "刷新" }}
+          {{ refreshLoading ? $t("common.refreshing") : $t("common.refresh") }}
         </span>
       </div>
     </div>
@@ -107,7 +106,9 @@ export default {
         error => {
           this.refreshLoading = false;
           this.$message.error(
-            "获取书架书籍失败 " + (error && error.toString())
+            this.$t("book.shelfLoadFailed", {
+              message: error && error.toString()
+            })
           );
           throw error;
         }

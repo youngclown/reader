@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="app">
     <keep-alive>
       <router-view></router-view>
@@ -6,17 +6,17 @@
     <el-dialog :visible.sync="showLogin" :width="dialogWidth" :top="dialogTop">
       <div class="custom-dialog-title" slot="title">
         <span class="el-dialog__title"
-          >{{ isLogin ? "登录" : "注册" }}
+          >{{ isLogin ? $t("common.login") : $t("common.register") }}
           <span class="float-right span-btn" @click="isLogin = !isLogin">{{
-            isLogin ? "注册" : "登录"
+            isLogin ? $t("common.register") : $t("common.login")
           }}</span>
         </span>
       </div>
       <el-form :model="loginForm">
-        <el-form-item label="用户名">
+        <el-form-item :label="$t('common.username')">
           <el-input v-model="loginForm.username" autocomplete="on"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item :label="$t('common.password')">
           <el-input
             type="password"
             v-model="loginForm.password"
@@ -25,18 +25,24 @@
             @keyup.enter.native="login"
           ></el-input>
         </el-form-item>
-        <el-form-item label="邀请码(没有则不填)" v-if="!isLogin">
+        <el-form-item :label="$t('auth.inviteCode')" v-if="!isLogin">
           <el-input
             v-model="loginForm.code"
             autocomplete="off"
             @keyup.enter.native="login"
           ></el-input>
         </el-form-item>
-        <el-checkbox v-model="remember">记住登录信息</el-checkbox>
+        <el-checkbox v-model="remember">{{
+          $t("auth.rememberLogin")
+        }}</el-checkbox>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="cancel">取 消</el-button>
-        <el-button size="medium" type="primary" @click="login">确 定</el-button>
+        <el-button size="medium" @click="cancel">{{
+          $t("common.cancel")
+        }}</el-button>
+        <el-button size="medium" type="primary" @click="login">{{
+          $t("common.confirm")
+        }}</el-button>
       </div>
     </el-dialog>
 
@@ -49,10 +55,12 @@
     >
       <div class="code-editor language-json" ref="editorRef"></div>
       <div slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="closeEditor">取 消</el-button>
-        <el-button size="medium" type="primary" @click="saveEditor"
-          >保 存</el-button
-        >
+        <el-button size="medium" @click="closeEditor">{{
+          $t("common.cancel")
+        }}</el-button>
+        <el-button size="medium" type="primary" @click="saveEditor">{{
+          $t("common.save")
+        }}</el-button>
       </div>
     </el-dialog>
 
@@ -137,13 +145,13 @@ import {
 
 Date.prototype.format = function(fmt) {
   var o = {
-    "M+": this.getMonth() + 1, //月份
-    "d+": this.getDate(), //日
-    "h+": this.getHours(), //小时
-    "m+": this.getMinutes(), //分
-    "s+": this.getSeconds(), //秒
-    "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-    S: this.getMilliseconds() //毫秒
+    "M+": this.getMonth() + 1,
+    "d+": this.getDate(),
+    "h+": this.getHours(),
+    "m+": this.getMinutes(),
+    "s+": this.getSeconds(),
+    "q+": Math.floor((this.getMonth() + 3) / 3),
+    S: this.getMilliseconds()
   };
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(
@@ -162,11 +170,6 @@ Date.prototype.format = function(fmt) {
   return fmt;
 };
 
-//字符编码数值对应的存储长度：
-//UCS-2编码(16进制) UTF-8 字节流(二进制)
-//0000 - 007F       0xxxxxxx （1字节）
-//0080 - 07FF       110xxxxx 10xxxxxx （2字节）
-//0800 - FFFF       1110xxxx 10xxxxxx 10xxxxxx （3字节）
 String.prototype.getBytesLength = function() {
   var totalLength = 0;
   var charCode;
@@ -213,7 +216,7 @@ export default {
         code: ""
       },
       showEditor: false,
-      editorTitle: "编辑器",
+      editorTitle: this.$t("common.editor"),
       editorContent: "",
 
       showReplaceRuleDialog: false,
@@ -433,7 +436,6 @@ export default {
     },
     connected(val) {
       if (val) {
-        // 连接后端成功，加载自定义样式
         window.customCSSLoad ||
           window.loadLink(this.$store.getters.customCSSUrl, () => {
             window.customCSSLoad = true;
@@ -469,10 +471,8 @@ export default {
     autoSetTheme(autoTheme) {
       if (autoTheme) {
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          // 是暗色模式
           this.$store.commit("setNightTheme", true);
         } else {
-          // 非暗色模式
           this.$store.commit("setNightTheme", false);
         }
       }
@@ -555,18 +555,12 @@ export default {
         });
       }
       await Promise.all([
-        // 加载书源列表
         this.loadBookSource(refresh),
-        // 加载分组列表
         this.loadBookGroup(refresh),
-        // 加载RSS订阅列表
         this.loadRssSources(refresh),
-        // 加载替换规则
         this.loadReplaceRules(refresh),
-        // 加载书签
         this.loadBookmarks(refresh)
       ]);
-      // 加载书架
       this.initing = false;
     },
     getUserInfo() {
@@ -588,7 +582,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载用户信息失败 " + (error && error.toString())
+            this.$t("user.loadInfoFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -604,7 +600,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载txt章节规则失败 " + (error && error.toString())
+            this.$t("catalog.loadTxtTocRulesFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -638,7 +636,11 @@ export default {
         })
         .catch(error => {
           this.$store.commit("setConnected", false);
-          this.$message.error("后端连接失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("home.backendConnectFailed", {
+              message: error && error.toString()
+            })
+          );
           throw error;
         });
     },
@@ -655,7 +657,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载分组列表失败 " + (error && error.toString())
+            this.$t("group.loadListFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -677,7 +681,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载RSS订阅列表失败 " + (error && error.toString())
+            this.$t("rss.loadSourceListFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -700,7 +706,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载书源列表失败 " + (error && error.toString())
+            this.$t("source.loadSourceListFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -718,7 +726,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载替换规则失败 " + (error && error.toString())
+            this.$t("replaceRule.loadListFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -735,24 +745,27 @@ export default {
           }
         },
         error => {
-          this.$message.error("加载书签失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("bookmark.loadListFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async isInShelf(book, addTip) {
       if (!book || !book.bookUrl || !book.origin) {
-        this.$message.error("书籍信息错误");
+        this.$message.error(this.$t("source.bookInfoError"));
         return false;
       }
-      // 判断是否加入了书架
       const isInShelf = this.$store.getters.shelfBooks.find(
         v => v.bookUrl === book.bookUrl
       );
       if (!isInShelf) {
         if (addTip) {
-          const res = await this.$confirm(addTip, "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
+          const res = await this.$confirm(addTip, this.$t("common.tip"), {
+            confirmButtonText: this.$t("common.confirm"),
+            cancelButtonText: this.$t("common.cancel"),
             type: "warning"
           }).catch(() => {
             return false;
@@ -760,7 +773,6 @@ export default {
           if (!res) {
             return false;
           }
-          // 加入书架
           return Axios.post(this.api + "/saveBook", book).then(
             res => {
               if (res.data.isSuccess) {
@@ -768,7 +780,7 @@ export default {
               }
             },
             () => {
-              this.$message.error("导入书籍失败");
+              this.$message.error(this.$t("source.importBookFailed"));
               return false;
             }
           );
@@ -867,7 +879,7 @@ export default {
   font-family: "reader-st";
   src: local("Songti SC"), local("Noto Serif CJK SC"),
     local("Source Han Serif SC"), local("Source Han Serif CN"), local("STSong"),
-    local("宋体"), local("明体"), local("明朝"), local("Songti"),
+    local("\5B8B\4F53"), local("\660E\4F53"), local("\660E\671D"), local("Songti"),
     local("Songti TC"), /*iOS6+iBooks3*/ local("Song S"), local("Song T"),
     local("STBShusong"), local("TBMincho"), local("HYMyeongJo"),
     /*Kindle Paperwihite*/ local("DK-SONGTI");
@@ -876,15 +888,15 @@ export default {
 @font-face {
   font-family: "reader-fs";
   src: local("STFangsong"), local("FangSong"), local("FangSong_GB2312"),
-    local("amasis30"), local("仿宋"), local("仿宋_GB2312"), local("Yuanti"),
+    local("amasis30"), local("\4EFF\5B8B"), local("\4EFF\5B8B_GB2312"), local("Yuanti"),
     local("Yuanti SC"), local("Yuanti TC"),
     /*iOS6+iBooks3*/ local("DK-FANGSONG");
 }
 
 @font-face {
   font-family: "reader-kt";
-  src: local("Kaiti SC"), local("STKaiti"), local("Caecilia"), local("楷体"),
-    local("楷体_GB2312"), local("Kaiti"), local("Kaiti SC"), local("Kaiti TC"),
+  src: local("Kaiti SC"), local("STKaiti"), local("Caecilia"), local("\6977\4F53"),
+    local("\6977\4F53_GB2312"), local("Kaiti"), local("Kaiti SC"), local("Kaiti TC"),
     /*iOS6+iBooks3*/ local("MKai PRC"), local("MKaiGB18030C-Medium"),
     local("MKaiGB18030C-Bold"), /*Kindle Paperwihite*/ local("DK-KAITI");
 }
@@ -893,7 +905,7 @@ export default {
   font-family: "reader-ht";
   src: local("Noto Sans CJK SC"), local("Source Han Sans SC"),
     local("Source Han Sans CN"), local("Microsoft YaHei"), local("PingFang SC"),
-    local("Hiragino Sans GB"), local("黑体"), local("微软雅黑"), local("Heiti"),
+    local("Hiragino Sans GB"), local("\9ED1\4F53"), local("\5FAE\8F6F\96C5\9ED1"), local("Heiti"),
     local("Heiti SC"), local("Heiti TC"), /*iOS6+iBooks3*/ local("MYing Hei S"),
     local("MYing Hei T"), local("TBGothic"),
     /*Kindle Paperwihite*/ local("DK-HEITI");

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-dialog
     :title="rssSource.sourceName"
     :visible.sync="show"
@@ -50,7 +50,11 @@
         class="load-more-rss"
         @click="hasMoreRssArticles && getRssArticles(page + 1)"
       >
-        {{ hasMoreRssArticles ? "加载更多" : "没有更多啦" }}
+        {{
+          hasMoreRssArticles
+            ? $t("contentSearch.loadMore")
+            : $t("common.noMore")
+        }}
       </div>
     </div>
   </el-dialog>
@@ -96,7 +100,9 @@ export default {
           this.getRssArticles();
         } catch (error) {
           // console.log(error);
-          this.$message.error("解析失败: " + error);
+          this.$message.error(
+            this.$t("common.parseFailed", { message: error })
+          );
         }
       } else {
         this.sortUrls = [];
@@ -115,7 +121,6 @@ export default {
     parseSourceUrl() {
       this.sourceUrl = this.rssSource.sourceUrl;
       if (!this.rssSource.singleUrl && this.rssSource.sortUrl) {
-        // 由于是在客户端解析，所以不支持解析 <js> 和 @js: 开头的 sortUrl
         const sortUrls = [];
         this.rssSource.sortUrl
           .replace(/\r\n/g, "\n")
@@ -154,7 +159,7 @@ export default {
             const articles = res.data.data.first;
             // const nextPageUrl = res.data.data.second;
             if (!articles.length) {
-              this.$message.error("没有数据");
+              this.$message.error(this.$t("common.noData"));
               this.hasMoreRssArticles = false;
               return;
             }
@@ -169,7 +174,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载RSS文章列表失败 " + (error && error.toString())
+            this.$t("rss.loadArticleListFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -192,7 +199,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载RSS文章内容失败 " + (error && error.toString())
+            this.$t("rss.loadArticleContentFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );

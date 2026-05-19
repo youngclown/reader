@@ -1,6 +1,8 @@
-<template>
+﻿<template>
   <el-dialog
-    :title="isShowBookGroupSettingDialog ? '设置分组' : '分组管理'"
+    :title="
+      isShowBookGroupSettingDialog ? $t('group.setGroup') : $t('group.manage')
+    "
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -26,7 +28,11 @@
           v-if="isShowBookGroupSettingDialog"
         >
         </el-table-column>
-        <el-table-column property="groupName" label="分组名" min-width="100">
+        <el-table-column
+          property="groupName"
+          :label="$t('group.name')"
+          min-width="100"
+        >
           <template slot-scope="scope">
             <div class="drag-icon">
               <i class="el-icon-rank"></i>
@@ -36,7 +42,7 @@
         </el-table-column>
         <el-table-column
           property="show"
-          label="显示"
+          :label="$t('group.visible')"
           min-width="80"
           v-if="!isShowBookGroupSettingDialog"
         >
@@ -52,11 +58,11 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
-            <el-button type="text" @click="saveBookGroup(scope.row)"
-              >编辑</el-button
-            >
+            <el-button type="text" @click="saveBookGroup(scope.row)">{{
+              $t("common.edit")
+            }}</el-button>
             <el-button
               type="text"
               v-if="
@@ -66,7 +72,7 @@
               "
               @click="deleteBookGroup(scope.row)"
               style="color: #f56c6c"
-              >删除</el-button
+              >{{ $t("common.delete") }}</el-button
             >
           </template>
         </el-table-column>
@@ -78,7 +84,7 @@
         size="medium"
         class="float-left"
         @click="saveBookGroup()"
-        >添加分组</el-button
+        >{{ $t("group.add") }}</el-button
       >
       <el-button
         type="primary"
@@ -86,16 +92,18 @@
         class="float-left"
         @click="saveOrder()"
         v-if="isShowSaveOrderButton"
-        >保存排序</el-button
+        >{{ $t("group.saveOrder") }}</el-button
       >
       <el-button
         type="primary"
         size="medium"
         @click="setBookGroup"
         v-if="isShowBookGroupSettingDialog"
-        >确认</el-button
+        >{{ $t("common.confirm") }}</el-button
       >
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -191,18 +199,13 @@ export default {
       return this.$root.$children[0].loadBookGroup(refresh);
     },
     getShowShelfBooks(bookGroup) {
-      // 处理特殊分组
       if (bookGroup === -1) {
-        // 全部
         return this.shelfBooks;
       } else if (bookGroup === -2) {
-        // 本地
         return this.shelfBooks.filter(v => v.origin === "loc_book");
       } else if (bookGroup === -3) {
-        // 音频
         return this.shelfBooks.filter(v => v.type === 1);
       } else if (bookGroup === -4) {
-        // 未分组
         return this.shelfBooks.filter(v => v.group === 0);
       }
 
@@ -217,21 +220,29 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("修改成功");
+            this.$message.success(this.$t("common.editSuccess"));
             this.loadBookGroup(true);
           }
         },
         error => {
-          this.$message.error("修改失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.editFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async deleteBookGroup(row) {
-      const res = await this.$confirm(`确认要删除该分组吗?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("group.confirmDelete"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -242,26 +253,30 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("删除分组成功");
+            this.$message.success(this.$t("group.deleteSuccess"));
             this.loadBookGroup(true);
           }
         },
         error => {
-          this.$message.error("删除分组失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("group.deleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async saveBookGroup(bookGroup) {
       const res = await this.$prompt(
         "",
-        `${bookGroup ? "编辑分组" : "添加分组"}`,
+        this.$t(bookGroup ? "group.edit" : "group.add"),
         {
           inputValue: bookGroup ? bookGroup.groupName : "",
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          inputValidator(v) {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          inputValidator: v => {
             if (!v) {
-              return "分组名不能为空";
+              return this.$t("group.nameRequired");
             }
             return true;
           }
@@ -278,13 +293,19 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success(bookGroup ? "修改成功" : "添加成功");
+            this.$message.success(
+              bookGroup
+                ? this.$t("common.editSuccess")
+                : this.$t("common.addSuccess")
+            );
             this.loadBookGroup(true);
           }
         },
         error => {
           this.$message.error(
-            (bookGroup ? "修改失败" : "添加失败") + (error && error.toString())
+            this.$t(bookGroup ? "common.editFailed" : "common.addFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -301,7 +322,7 @@ export default {
     },
     setBookGroup() {
       if (!this.bookGroupSelection.length) {
-        this.$message.error("请选择书籍分组");
+        this.$message.error(this.$t("group.selectBookGroup"));
         return;
       }
       Axios.post(this.api + "/saveBookGroupId", {
@@ -312,14 +333,18 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("设置成功");
+            this.$message.success(this.$t("common.setSuccess"));
             this.cancel();
             this.showBookInfo = res.data.data;
             this.$store.commit("updateShelfBook", res.data.data);
           }
         },
         error => {
-          this.$message.error("设置失败" + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.setFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -361,12 +386,16 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("保存成功");
+            this.$message.success(this.$t("common.saveSuccess"));
             this.loadBookGroup(true);
           }
         },
         error => {
-          this.$message.error("保存失败" + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.saveFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     }

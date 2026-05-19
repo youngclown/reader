@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="新增用户"
+    :title="$t('auth.addUser')"
     :visible.sync="show"
     :width="dialogSmallWidth"
     :top="dialogTop"
@@ -12,10 +12,10 @@
     :before-close="cancel"
   >
     <el-form :model="addUserForm">
-      <el-form-item label="用户名">
+      <el-form-item :label="$t('common.username')">
         <el-input v-model="addUserForm.username" autocomplete="on"></el-input>
       </el-form-item>
-      <el-form-item label="密码">
+      <el-form-item :label="$t('common.password')">
         <el-input
           type="password"
           v-model="addUserForm.password"
@@ -26,8 +26,12 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button size="medium" @click="cancel">取 消</el-button>
-      <el-button size="medium" type="primary" @click="save">确 定</el-button>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
+      <el-button size="medium" type="primary" @click="save">{{
+        $t("common.confirm")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -69,17 +73,17 @@ export default {
     },
     save() {
       if (!this.addUserForm.username) {
-        this.$message.success("用户名不能为空");
+        this.$message.success(this.$t("auth.usernameRequired"));
         return;
       }
       if (!this.addUserForm.password) {
-        this.$message.success("密码不能为空");
+        this.$message.success(this.$t("auth.passwordRequired"));
         return;
       }
       Axios.post(this.api + "/addUser", this.addUserForm).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("新增成功");
+            this.$message.success(this.$t("auth.addSuccess"));
             this.cancel();
             const userList = res.data.data.map(v => ({
               ...v,
@@ -89,7 +93,9 @@ export default {
           }
         },
         error => {
-          this.$message.error("新增失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("auth.addFailed", { message: error && error.toString() })
+          );
         }
       );
     }

@@ -5,13 +5,31 @@
     :class="{ night: $store.getters.isNight, day: !$store.getters.isNight }"
   >
     <div class="settings-title">
-      设置
-      <div class="title-btn" @click="resetConfig">重置为默认配置</div>
+      {{ $t("reader.settingsTitle") }}
+      <div class="title-btn" @click="resetConfig">
+        {{ $t("reader.resetDefaultConfig") }}
+      </div>
     </div>
     <div class="setting-list">
       <ul>
         <li>
-          <span class="setting-item-title">特殊模式</span>
+          <span class="setting-item-title">{{ $t("reader.appLanguage") }}</span>
+          <div class="selection-zone">
+            <span
+              class="span-item"
+              v-for="locale in $localeOptions"
+              :key="'settings-locale-' + locale"
+              :class="{ selected: config.locale === locale }"
+              @click="setLocaleConfig(locale)"
+              >{{ $t("language." + locale) }}</span
+            >
+          </div>
+        </li>
+        <el-divider></el-divider>
+        <li>
+          <span class="setting-item-title">{{
+            $t("readSettings.specialMode")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -19,16 +37,22 @@
               :key="index"
               :class="{ selected: config.pageType == type }"
               @click="setPageType(type)"
-              >{{ type === "Kindle" ? "简洁" : "正常" }}</span
+              >{{
+                type === "Kindle"
+                  ? $t("readSettings.simple")
+                  : $t("readSettings.normal")
+              }}</span
             >
-            <span class="small-tip"
-              >❗️开启简洁模式会关闭动画以及首页的部分功能</span
-            >
+            <span class="small-tip">{{
+              $t("readSettings.simpleModeTip")
+            }}</span>
           </div>
         </li>
         <el-divider></el-divider>
         <li>
-          <span class="setting-item-title">配置方案</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.configScheme")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -40,7 +64,7 @@
               }"
               @click="setCustomConfig(customConfig)"
             >
-              <span>{{ customConfig.name }}</span>
+              <span>{{ configName(customConfig) }}</span>
               <i
                 class="el-icon-close delete-custom-config-icon"
                 v-if="
@@ -54,7 +78,7 @@
               class="span-item"
               :key="'addNewCustomConfig'"
               @click="addNewCustomConfig"
-              >新增方案</span
+              >{{ $t("readSettings.addScheme") }}</span
             >
             <span
               class="span-item"
@@ -62,12 +86,14 @@
               ref="themes"
               @click="setAutoTheme"
               :class="{ selected: $store.getters.config.autoTheme }"
-              >自动切换</span
+              >{{ $t("readSettings.autoTheme") }}</span
             >
           </div>
         </li>
         <li>
-          <span class="setting-item-title">方案类型</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.schemeType")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -78,12 +104,12 @@
                   currentCustomConfig.configDefaultType === configDefaultType
               }"
               @click="setConfigDefaultType(configDefaultType)"
-              >{{ configDefaultType }}</span
+              >{{ optionLabel(configDefaultType) }}</span
             >
           </div>
         </li>
         <li>
-          <span class="setting-item-title">阅读主题</span>
+          <span class="setting-item-title">{{ $t("readSettings.theme") }}</span>
           <div class="selection-zone">
             <span
               class="theme-item"
@@ -102,38 +128,46 @@
               ref="themes"
               @click="setConfig('theme', 'custom')"
               :class="{ selected: config.theme === 'custom' }"
-              >自定义</span
+              >{{ $t("readSettings.custom") }}</span
             >
           </div>
         </li>
         <li v-if="config.theme === 'custom'">
-          <span class="setting-item-title">自定义</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.custom")
+          }}</span>
           <div class="custom-theme">
             <div class="custom-theme-title">
-              <span class="custom-theme-title">主题模式</span>
+              <span class="custom-theme-title">{{
+                $t("readSettings.themeMode")
+              }}</span>
               <span
                 class="span-item"
                 v-for="(type, index) in themeTypes"
                 :key="index"
                 :class="{ selected: themeType == type }"
                 @click="setConfig('themeType', type)"
-                >{{ type === "day" ? "白天" : "黑夜" }}</span
+                >{{
+                  type === "day"
+                    ? $t("readSettings.day")
+                    : $t("readSettings.night")
+                }}</span
               >
             </div>
             <span class="custom-theme-title"
-              >页面背景颜色
+              >{{ $t("readSettings.bodyColor") }}
               <el-color-picker v-model="config.bodyColor"></el-color-picker>
             </span>
             <span class="custom-theme-title"
-              >浮窗背景颜色
+              >{{ $t("readSettings.popupColor") }}
               <el-color-picker v-model="config.popupColor"></el-color-picker
             ></span>
             <span class="custom-theme-title"
-              >阅读背景颜色
+              >{{ $t("readSettings.contentColor") }}
               <el-color-picker v-model="config.contentColor"></el-color-picker
             ></span>
             <span class="custom-theme-title"
-              >阅读背景图片
+              >{{ $t("readSettings.contentBgImage") }}
               <img
                 class="content-bg-preview"
                 v-for="(item, index) in builtinBG"
@@ -164,7 +198,9 @@
                 ></i>
               </div>
 
-              <span class="upload-bg-btn" @click="uploadBGFile">上传</span>
+              <span class="upload-bg-btn" @click="uploadBGFile">{{
+                $t("readSettings.upload")
+              }}</span>
               <input
                 ref="bgFileRef"
                 type="file"
@@ -175,7 +211,7 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">正文字体</span>
+          <span class="setting-item-title">{{ $t("readSettings.font") }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -183,7 +219,7 @@
               :key="index"
               :class="{ selected: config.font == index }"
               @click="setConfig('font', index)"
-              >{{ font }}
+              >{{ optionLabel(font) }}
               <i
                 :class="{
                   'el-icon-upload': true,
@@ -192,7 +228,7 @@
                     config.customFontsMap &&
                     config.customFontsMap[customFonts[index]]
                 }"
-                @click.stop="uploadFontFile(customFonts[index], font)"
+                @click.stop="uploadFontFile(customFonts[index], optionLabel(font))"
               ></i>
             </span>
             <input
@@ -204,7 +240,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">简繁转换</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.chineseFont")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -212,12 +250,14 @@
               :key="index"
               :class="{ selected: config.chineseFont == chineseFont }"
               @click="setConfig('chineseFont', chineseFont)"
-              >{{ chineseFont }}</span
+              >{{ optionLabel(chineseFont) }}</span
             >
           </div>
         </li>
         <li>
-          <span class="setting-item-title">字体大小</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.fontSize")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('fontSize')"
               ><em class="iconfont">&#58966;</em></span
@@ -235,7 +275,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">字体粗细</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.fontWeight")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('fontWeight')"
               ><i class="el-icon-minus"></i></span
@@ -253,7 +295,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">段落行高</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.lineHeight")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('lineHeight')"
               ><i class="el-icon-minus"></i></span
@@ -271,7 +315,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">段落间距</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.paragraphSpace")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('paragraphSpace')"
               ><i class="el-icon-minus"></i></span
@@ -289,11 +335,15 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title font-color-title">字体颜色</span>
+          <span class="setting-item-title font-color-title">{{
+            $t("readSettings.fontColor")
+          }}</span>
           <el-color-picker v-model="config.fontColor"></el-color-picker>
         </li>
         <li>
-          <span class="setting-item-title">页面模式</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.pageMode")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -301,12 +351,14 @@
               :key="index"
               :class="{ selected: config.pageMode == mode }"
               @click="setPageMode(mode)"
-              >{{ mode }}</span
+              >{{ optionLabel(mode) }}</span
             >
           </div>
         </li>
         <li v-if="!$store.state.miniInterface">
-          <span class="setting-item-title">页面宽度</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.pageWidth")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('readWidth')"
               ><em class="iconfont">&#58965;</em></span
@@ -318,7 +370,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">翻页方式</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.readMethod")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -327,18 +381,18 @@
               :class="{ selected: config.readMethod == method }"
               @click="setReadMethod(method)"
               v-show="
-                (!$store.state.miniInterface && method !== '左右滑动') ||
+                (!$store.state.miniInterface && method !== 'horizontalSwipe') ||
                   $store.state.miniInterface
               "
-              >{{ method }}</span
+              >{{ optionLabel(method) }}</span
             >
-            <span class="small-tip"
-              >❗️上下滚动2会自动隐藏看过的章节，但是可能会抖动</span
-            >
+            <span class="small-tip">{{ $t("readSettings.scroll2Tip") }}</span>
           </div>
         </li>
         <li>
-          <span class="setting-item-title">动画时长</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.animateTime")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('animateMSTime')"
               ><i class="el-icon-minus"></i></span
@@ -356,7 +410,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">自动翻页</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.autoReading")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -364,12 +420,15 @@
               :key="index"
               :class="{ selected: config.autoReadingMethod === method }"
               @click="setConfig('autoReadingMethod', method)"
-              >{{ method }}</span
+              >{{ optionLabel(method) }}</span
+            >
             >
           </div>
         </li>
-        <li v-if="config.autoReadingMethod === '像素滚动'">
-          <span class="setting-item-title">滚动像素</span>
+        <li v-if="config.autoReadingMethod === 'pixelScroll'">
+          <span class="setting-item-title">{{
+            $t("readSettings.scrollPixel")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('autoReadingPixel')"
               ><i class="el-icon-minus"></i></span
@@ -387,7 +446,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">翻页速度</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.pageSpeed")
+          }}</span>
           <div class="resize">
             <span class="less" @click="decConfig('autoReadingLineTime')"
               ><i class="el-icon-minus"></i></span
@@ -405,7 +466,9 @@
           </div>
         </li>
         <li>
-          <span class="setting-item-title">全屏点击</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.fullScreenClick")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -413,12 +476,14 @@
               :key="index"
               :class="{ selected: config.clickMethod == method }"
               @click="setConfig('clickMethod', method)"
-              >{{ method }}</span
+              >{{ optionLabel(method) }}</span
             >
           </div>
         </li>
         <li>
-          <span class="setting-item-title">选择文字</span>
+          <span class="setting-item-title">{{
+            $t("readSettings.textSelection")
+          }}</span>
           <div class="selection-zone">
             <span
               class="span-item"
@@ -426,14 +491,18 @@
               :key="index"
               :class="{ selected: config.selectionAction == action }"
               @click="setConfig('selectionAction', action)"
-              >{{ action }}</span
+              >{{ optionLabel(action) }}</span
             >
           </div>
         </li>
         <el-divider></el-divider>
         <li class="operation-zone">
-          <span class="span-btn" @click="showClickZone">显示翻页区域</span>
-          <span class="span-btn" @click="showRuleEditor">过滤规则管理</span>
+          <span class="span-btn" @click="showClickZone">{{
+            $t("readSettings.showClickZone")
+          }}</span>
+          <span class="span-btn" @click="showRuleEditor">{{
+            $t("readSettings.ruleManage")
+          }}</span>
         </li>
       </ul>
     </div>
@@ -442,11 +511,10 @@
 
 <script>
 import Axios from "../plugins/axios";
-import settings from "../plugins/config";
+import settings, { customFonts, normalizeConfigValues } from "../plugins/config";
 import eventBus from "../plugins/eventBus";
 import { isMiniInterface, removeFont } from "../plugins/helper";
 import { setCache, getCache } from "../plugins/cache";
-import { customFonts } from "../plugins/config";
 
 export default {
   name: "ReadSettings",
@@ -479,31 +547,36 @@ export default {
         }
       ],
       builtinBG: [
-        { src: "bg/山水画.jpg" },
-        { src: "bg/山水墨影.jpg" },
-        { src: "bg/羊皮纸1.jpg" },
-        { src: "bg/护眼漫绿.jpg" },
-        { src: "bg/羊皮纸2.jpg" },
-        { src: "bg/新羊皮纸.jpg" },
-        { src: "bg/羊皮纸3.jpg" },
-        { src: "bg/明媚倾城.jpg" },
-        { src: "bg/羊皮纸4.jpg" },
-        { src: "bg/深宫魅影.jpg" },
-        { src: "bg/午后沙滩.jpg" },
-        { src: "bg/清新时光.jpg" },
-        { src: "bg/宁静夜色.jpg" },
-        { src: "bg/边彩画布.jpg" }
+        { src: "bg/landscape-painting.jpg" },
+        { src: "bg/ink-landscape.jpg" },
+        { src: "bg/parchment-1.jpg" },
+        { src: "bg/eye-care-green.jpg" },
+        { src: "bg/parchment-2.jpg" },
+        { src: "bg/new-parchment.jpg" },
+        { src: "bg/parchment-3.jpg" },
+        { src: "bg/bright-city.jpg" },
+        { src: "bg/parchment-4.jpg" },
+        { src: "bg/palace-shadow.jpg" },
+        { src: "bg/afternoon-beach.jpg" },
+        { src: "bg/fresh-time.jpg" },
+        { src: "bg/quiet-night.jpg" },
+        { src: "bg/color-edge-canvas.jpg" }
       ],
-      fonts: ["系统", "黑体", "楷体", "宋体", "仿宋"],
-      readMethods: ["上下滑动", "左右滑动", "上下滚动", "上下滚动2"],
-      clickMethods: ["下一页", "自动", "不翻页"],
-      selectionActions: ["操作弹窗", "忽略"],
-      pageModes: ["自适应", "手机模式"],
-      pageTypes: ["正常", "Kindle"],
+      fonts: ["system", "heiti", "kaiti", "songti", "fangsong"],
+      readMethods: [
+        "verticalSwipe",
+        "horizontalSwipe",
+        "verticalScroll",
+        "verticalScroll2"
+      ],
+      clickMethods: ["nextPage", "auto", "noTurn"],
+      selectionActions: ["actionPopup", "ignore"],
+      pageModes: ["adaptive", "mobileMode"],
+      pageTypes: ["normal", "Kindle"],
       themeTypes: ["day", "night"],
-      configDefaultTypeList: ["白天默认", "黑夜默认"],
-      autoReadingMethods: ["像素滚动", "段落滚动"],
-      chineseFonts: ["简体", "繁体"],
+      configDefaultTypeList: ["dayDefault", "nightDefault"],
+      autoReadingMethods: ["pixelScroll", "paragraphScroll"],
+      chineseFonts: ["simplified", "traditional"],
 
       customFontName: "",
       customFonts: customFonts,
@@ -529,11 +602,7 @@ export default {
   mounted() {
     this.config = {
       ...settings.config,
-      ...this.config,
-      selectionAction:
-        this.$store.state.config.selectionAction === "过滤弹窗"
-          ? "操作弹窗"
-          : "忽略"
+      ...normalizeConfigValues(this.config)
     };
   },
   computed: {
@@ -560,6 +629,40 @@ export default {
     }
   },
   methods: {
+    optionLabel(value) {
+      const optionKeyMap = {
+        system: "system",
+        heiti: "heiti",
+        kaiti: "kaiti",
+        songti: "songti",
+        fangsong: "fangsong",
+        simplified: "simplified",
+        traditional: "traditional",
+        verticalSwipe: "verticalSwipe",
+        horizontalSwipe: "horizontalSwipe",
+        verticalScroll: "verticalScroll",
+        verticalScroll2: "verticalScroll2",
+        nextPage: "nextPage",
+        auto: "auto",
+        noTurn: "noTurn",
+        actionPopup: "actionPopup",
+        ignore: "ignore",
+        adaptive: "adaptive",
+        mobileMode: "mobileMode",
+        dayDefault: "dayDefault",
+        nightDefault: "nightDefault",
+        pixelScroll: "pixelScroll",
+        paragraphScroll: "paragraphScroll",
+        normal: "normal",
+        builtInDay: "builtInDay",
+        builtInNight: "builtInNight"
+      };
+      const key = optionKeyMap[value];
+      return key ? this.$t("readSettings.option." + key) : value;
+    },
+    configName(config) {
+      return this.optionLabel(config.name);
+    },
     setPageType(type) {
       if (type === this.config.pageType) {
         return;
@@ -568,25 +671,25 @@ export default {
       if (type === "Kindle") {
         setCache("lastNormalConfig", this.config);
 
-        lastConfig = getCache("lastKindleConfig");
+        lastConfig = normalizeConfigValues(getCache("lastKindleConfig"));
         lastConfig = lastConfig || {
           animateMSTime: 0,
           fontSize: Math.min(this.fontSize, 20),
           theme: 7,
-          readMethod: "左右滑动",
-          selectionAction: "忽略",
-          pageMode: "手机模式"
+          readMethod: "horizontalSwipe",
+          selectionAction: "ignore",
+          pageMode: "mobileMode"
         };
       } else {
         setCache("lastKindleConfig", this.config);
-        lastConfig = getCache("lastNormalConfig") || {};
+        lastConfig = normalizeConfigValues(getCache("lastNormalConfig")) || {};
       }
 
       this.config = { ...this.config, ...(lastConfig || {}), pageType: type };
 
       this.$emit("readMethodChange");
       this.$emit("pageModeChange");
-      if (this.config.pageMode === "手机模式") {
+      if (this.config.pageMode === "mobileMode") {
         this.$store.commit("setMiniInterface", true);
       } else {
         this.$store.commit("setMiniInterface", isMiniInterface());
@@ -595,7 +698,7 @@ export default {
     setPageMode(pageMode) {
       this.$emit("pageModeChange");
       this.config = { ...this.config, pageMode };
-      if (this.config.pageMode === "手机模式") {
+      if (this.config.pageMode === "mobileMode") {
         this.$store.commit("setMiniInterface", true);
       } else {
         this.$store.commit("setMiniInterface", isMiniInterface());
@@ -609,6 +712,10 @@ export default {
       const data = {};
       data[name] = value;
       this.config = { ...this.config, ...data };
+    },
+    setLocaleConfig(locale) {
+      this.$setLocale(locale);
+      this.setConfig("locale", locale);
     },
     setAutoTheme() {
       this.config = { ...this.config, autoTheme: !this.config.autoTheme };
@@ -662,7 +769,7 @@ export default {
         res => {
           if (res.data.isSuccess) {
             if (!res.data.data.length) {
-              this.$message.error("上传文件失败");
+              this.$message.error(this.$t("common.uploadFileFailed"));
               return;
             }
             let config = { ...this.config };
@@ -675,7 +782,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("上传文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.uploadFileFailedWithMessage", {
+              message: error && error.toString()
+            })
+          );
         }
       );
       this.$refs.bgFileRef.value = null;
@@ -686,11 +797,11 @@ export default {
         this.config.customFontsMap[customFontName]
       ) {
         const res = await this.$confirm(
-          `已上传自定义的${fontName}字体?`,
-          "提示",
+          this.$t("readSettings.customFontUploaded", { fontName }),
+          this.$t("common.tip"),
           {
-            confirmButtonText: "继续上传",
-            cancelButtonText: "恢复默认",
+            confirmButtonText: this.$t("readSettings.continueUpload"),
+            cancelButtonText: this.$t("readSettings.restoreDefaultFont"),
             type: "warning",
             closeOnClickModal: false,
             closeOnPressEscape: false,
@@ -716,7 +827,9 @@ export default {
             },
             error => {
               this.$message.error(
-                "删除自定义字体文件失败 " + (error && error.toString())
+                this.$t("readSettings.customFontDeleteFailed", {
+                  message: error && error.toString()
+                })
               );
             }
           );
@@ -730,7 +843,7 @@ export default {
       const rawFile = event.target.files && event.target.files[0];
       // console.log("rawFile", rawFile);
       if (!rawFile.name.toLowerCase().endsWith(".ttf")) {
-        this.$message.error("只支持 TTF 字体文件");
+        this.$message.error(this.$t("readSettings.ttfOnly"));
         return;
       }
       let param = new FormData();
@@ -742,7 +855,7 @@ export default {
         res => {
           if (res.data.isSuccess) {
             if (!res.data.data.length) {
-              this.$message.error("上传文件失败");
+              this.$message.error(this.$t("common.uploadFileFailed"));
               return;
             }
             let config = { ...this.config };
@@ -752,7 +865,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("上传文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.uploadFileFailedWithMessage", {
+              message: error && error.toString()
+            })
+          );
         }
       );
       this.$refs.fontFileRef.value = null;
@@ -776,7 +893,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("删除文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.fileDeleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -792,17 +913,21 @@ export default {
       eventBus.$emit("showReplaceRuleDialog");
     },
     async addNewCustomConfig() {
-      const res = await this.$prompt("请输入方案名称", `添加配置方案`, {
-        inputValue: "",
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        inputValidator(v) {
-          if (!v) {
-            return "方案名不能为空";
+      const res = await this.$prompt(
+        this.$t("readSettings.schemeNamePrompt"),
+        this.$t("readSettings.addSchemeTitle"),
+        {
+          inputValue: "",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          inputValidator: v => {
+            if (!v) {
+              return this.$t("readSettings.schemeNameRequired");
+            }
+            return true;
           }
-          return true;
         }
-      }).catch(() => {
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -810,13 +935,15 @@ export default {
       }
       const name = res.value.replace(/^\s+/, "").replace(/\s+$/, "");
       if (!name) {
-        return "方案名不能为空";
+        this.$message.error(this.$t("readSettings.schemeNameRequired"));
+        return;
       }
       const isExist = this.$store.state.customConfigList.find(
         v => v.name === name
       );
       if (isExist) {
-        return "方案名不能重复";
+        this.$message.error(this.$t("readSettings.schemeNameDuplicate"));
+        return;
       }
       const newConfig = { ...this.$store.state.customConfigList[0] };
       newConfig.name = name;
@@ -835,22 +962,26 @@ export default {
     async deleteCustomConfig(index, name) {
       const customConfigList = [].concat(this.$store.state.customConfigList);
       if (index <= 1) {
-        this.$message.error("内置方案不能删除");
+        this.$message.error(this.$t("readSettings.builtInSchemeCannotDelete"));
         return;
       }
       if (customConfigList.length <= index) {
-        this.$message.error("方案不存在");
+        this.$message.error(this.$t("readSettings.schemeNotFound"));
         return;
       }
       if (this.$store.state.config.customConfig === name) {
-        this.$message.error("方案正在使用，无法删除");
+        this.$message.error(this.$t("readSettings.schemeInUse"));
         return;
       }
-      const res = await this.$confirm(`确认要删除${name}方案吗？`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("readSettings.confirmDeleteScheme", { name }),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -862,11 +993,13 @@ export default {
     },
     async setConfigDefaultType(configDefaultType) {
       const res = await this.$confirm(
-        `确认要设置当前方案为${configDefaultType}吗？继续操作将替换现有的${configDefaultType}方案`,
-        "提示",
+        this.$t("readSettings.confirmSetDefaultScheme", {
+          type: this.optionLabel(configDefaultType)
+        }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="WebDAV文件管理"
+    :title="$t('file.webdavManage')"
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -27,7 +27,7 @@
         <el-table-column
           property="name"
           min-width="150px"
-          label="文件名"
+          :label="$t('file.name')"
           :fixed="$store.state.miniInterface"
         >
           <template slot-scope="scope">
@@ -42,42 +42,42 @@
         </el-table-column>
         <el-table-column
           property="size"
-          label="大小"
+          :label="$t('file.size')"
           :formatter="formatTableField"
           min-width="100px"
         ></el-table-column>
         <el-table-column
           property="lastModified"
-          label="修改时间"
+          :label="$t('file.modifiedAt')"
           :formatter="formatTableField"
           width="120px"
         ></el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
             <el-button
               type="text"
               @click="restoreFromWebdav(scope.row)"
               v-if="!scope.row.isDirectory && scope.row.name.endsWith('.zip')"
-              >还原</el-button
+              >{{ $t("file.restore") }}</el-button
             >
             <el-button
               type="text"
               @click="downloadFromWebdav(scope.row)"
               v-if="!scope.row.isDirectory"
-              >下载</el-button
+              >{{ $t("file.download") }}</el-button
             >
             <el-button
               type="text"
               @click="importFromWebdav(scope.row)"
               v-if="canImport(scope.row)"
-              >加入书架</el-button
+              >{{ $t("file.addToShelf") }}</el-button
             >
             <el-button
               type="text"
               @click="deleteWebdavFile(scope.row)"
               style="color: #f56c6c"
               v-if="!scope.row.toParent"
-              >删除</el-button
+              >{{ $t("common.delete") }}</el-button
             >
           </template>
         </el-table-column>
@@ -89,14 +89,14 @@
         size="medium"
         class="float-left"
         @click="deleteWebdavFileList"
-        >批量删除</el-button
+        >{{ $t("book.batchDelete") }}</el-button
       >
       <el-button
         type="primary"
         size="medium"
         class="float-left"
         @click="importFromWebdav(true)"
-        >批量加入书架</el-button
+        >{{ $t("file.batchAddToShelf") }}</el-button
       >
       <el-button
         type="primary"
@@ -104,7 +104,7 @@
         class="float-left"
         @click="uploadToWebDAV"
       >
-        上传文件
+        {{ $t("file.upload") }}
       </el-button>
       <input
         ref="fileRef"
@@ -113,8 +113,12 @@
         @change="onFileChange"
         style="display:none"
       />
-      <span class="check-tip">已选择 {{ fileSelection.length }} 个</span>
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <span class="check-tip">{{
+        $t("book.selectedCount", { count: fileSelection.length })
+      }}</span>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -196,21 +200,27 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载 WebDAV 文件列表失败 " + (error && error.toString())
+            this.$t("file.webdavLoadFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
     },
     async deleteWebdavFileList() {
       if (!this.fileSelection.length) {
-        this.$message.error("请选择需要删除的文件");
+        this.$message.error(this.$t("file.selectDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的文件吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("file.confirmDeleteSelected"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -222,22 +232,28 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.fileSelection = [];
-            this.$message.success("删除文件成功");
+            this.$message.success(this.$t("common.fileDeleteSuccess"));
             this.showWebdavFile(this.currentPath);
           }
         },
         error => {
-          this.$message.error("删除文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.fileDeleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async deleteWebdavFile(row) {
       const res = await this.$confirm(
-        `确认要删除该${row.isDirectory ? "文件夹" : "文件"}吗?`,
-        "提示",
+        this.$t("file.confirmDeleteOne", {
+          type: row.isDirectory ? this.$t("file.folder") : this.$t("file.file")
+        }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -251,22 +267,26 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("删除文件成功");
+            this.$message.success(this.$t("common.fileDeleteSuccess"));
             this.showWebdavFile(this.currentPath);
           }
         },
         error => {
-          this.$message.error("删除文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.fileDeleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async restoreFromWebdav(row) {
       const res = await this.$confirm(
-        `确认要从该压缩文件恢复书源、书架、分组和RSS订阅数据吗?`,
-        "提示",
+        this.$t("file.confirmRestoreArchive"),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -280,12 +300,16 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("恢复成功");
+            this.$message.success(this.$t("source.restoreSuccess"));
             this.init(true);
           }
         },
         error => {
-          this.$message.error("恢复失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.restoreFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -317,12 +341,16 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("上传文件成功");
+            this.$message.success(this.$t("file.uploadSuccess"));
             this.showWebdavFile(this.currentPath);
           }
         },
         error => {
-          this.$message.error("上传文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.uploadFileFailedWithMessage", {
+              message: error && error.toString()
+            })
+          );
         }
       );
       this.$refs.fileRef.value = null;
@@ -330,7 +358,7 @@ export default {
     async importFromWebdav(row) {
       if (row === true) {
         if (!this.fileSelection.length) {
-          this.$message.error("请选择需要加入书架的书籍");
+          this.$message.error(this.$t("file.selectAddToShelfRequired"));
           return;
         }
       }
@@ -341,7 +369,7 @@ export default {
         res => {
           if (res.data.isSuccess) {
             if (!res.data.data || !res.data.data.length) {
-              this.$message.error("没有选择可导入的书籍");
+              this.$message.error(this.$t("file.noImportableBooks"));
               return;
             }
             // this.cancel();
@@ -351,7 +379,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("请求失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.requestFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     }

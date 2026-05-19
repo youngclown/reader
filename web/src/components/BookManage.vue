@@ -1,6 +1,6 @@
-<template>
+﻿<template>
   <el-dialog
-    title="书架管理"
+    :title="$t('book.shelfManage')"
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -13,8 +13,10 @@
   >
     <div class="custom-dialog-title" slot="title">
       <span class="el-dialog__title"
-        >书架管理
-        <span class="float-right small-tip">❗️只能缓存文本内容</span>
+        >{{ $t("book.shelfManage") }}
+        <span class="float-right small-tip"
+          >! {{ $t("book.textCacheOnly") }}</span
+        >
       </span>
     </div>
     <div class="source-container table-container">
@@ -32,7 +34,7 @@
         </el-table-column>
         <el-table-column
           property="name"
-          label="书名名"
+          :label="$t('book.title')"
           min-width="100"
           :fixed="$store.state.miniInterface"
         >
@@ -48,31 +50,41 @@
         </el-table-column>
         <el-table-column
           property="author"
-          label="作者"
+          :label="$t('book.author')"
           min-width="100"
         ></el-table-column>
-        <el-table-column label="分组" min-width="120">
+        <el-table-column :label="$t('book.group')" min-width="120">
           <template slot-scope="scope">
             {{ renderBookGroup(scope.row) }}
           </template>
         </el-table-column>
-        <el-table-column label="章节" min-width="120">
+        <el-table-column :label="$t('book.chapter')" min-width="120">
           <template slot-scope="scope">
-            <span>共 {{ scope.row.totalChapterNum }} 章</span><br />
+            <span>{{
+              $t("book.totalChapters", { count: scope.row.totalChapterNum })
+            }}</span
+            ><br />
             <span v-if="scope.row.origin !== 'loc_book'">
-              服务器缓存： {{ scope.row.cachedChapterCount || 0 }} 章 <br
+              {{
+                $t("book.serverCache", {
+                  count: scope.row.cachedChapterCount || 0
+                })
+              }}
+              <br
             /></span>
-            <span>浏览器缓存： {{ scope.row.localCacheCount }} 章</span>
+            <span>{{
+              $t("book.browserCache", { count: scope.row.localCacheCount })
+            }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
             <el-button
               class="text-button"
               size="medium"
               type="text"
               @click="editBook(scope.row)"
-              >编辑</el-button
+              >{{ $t("common.edit") }}</el-button
             >
             <el-button
               class="text-button"
@@ -80,43 +92,49 @@
               type="text"
               style="margin-left: 0"
               @click="setBookGroup(scope.row)"
-              >分组</el-button
+              >{{ $t("book.group") }}</el-button
             >
             <el-dropdown @command="cacheBook(scope.row, $event)">
               <el-button class="text-button" type="text" size="medium">
                 <span v-if="isCaching(scope.row)">
-                  <i class="el-icon-loading"></i> 缓存中
+                  <i class="el-icon-loading"></i> {{ $t("book.caching") }}
                 </span>
                 <span v-else>
-                  缓存<i class="el-icon-arrow-down el-icon--right"></i>
+                  {{ $t("book.cache")
+                  }}<i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
               </el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                   v-if="scope.row.origin !== 'loc_book'"
                   command="cacheBookSSE"
-                  >缓存到服务器</el-dropdown-item
+                  >{{ $t("book.cacheToServer") }}</el-dropdown-item
                 >
-                <el-dropdown-item command="cacheBookLocal"
-                  >缓存到浏览器</el-dropdown-item
-                >
+                <el-dropdown-item command="cacheBookLocal">{{
+                  $t("book.cacheToBrowser")
+                }}</el-dropdown-item>
                 <el-dropdown-item
                   v-if="scope.row.origin !== 'loc_book'"
                   command="deleteBookCache"
-                  >删除服务器缓存</el-dropdown-item
+                  >{{ $t("book.deleteServerCache") }}</el-dropdown-item
                 >
-                <el-dropdown-item command="deleteBookLocalCache"
-                  >删除浏览器缓存</el-dropdown-item
-                >
+                <el-dropdown-item command="deleteBookLocalCache">{{
+                  $t("book.deleteBrowserCache")
+                }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
             <el-dropdown @command="exportBook(scope.row, $event)">
               <el-button class="text-button" type="text" size="medium">
-                导出<i class="el-icon-arrow-down el-icon--right"></i>
+                {{ $t("book.export")
+                }}<i class="el-icon-arrow-down el-icon--right"></i>
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="txt">导出为TXT</el-dropdown-item>
-                <el-dropdown-item command="epub">导出为Epub</el-dropdown-item>
+                <el-dropdown-item command="txt">{{
+                  $t("book.exportTxt")
+                }}</el-dropdown-item>
+                <el-dropdown-item command="epub">{{
+                  $t("book.exportEpub")
+                }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -129,11 +147,12 @@
         size="medium"
         class="float-left"
         @click="deleteBookList"
-        >批量删除</el-button
+        >{{ $t("book.batchDelete") }}</el-button
       >
       <el-dropdown class="float-left" @command="addBookGroupMulti">
         <el-button type="primary" size="medium">
-          批量添加分组<i class="el-icon-arrow-down el-icon--right"></i>
+          {{ $t("book.batchAddGroup")
+          }}<i class="el-icon-arrow-down el-icon--right"></i>
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item
@@ -146,7 +165,8 @@
       </el-dropdown>
       <el-dropdown class="float-left" @command="removeBookGroupMulti">
         <el-button type="primary" size="medium">
-          批量移除分组<i class="el-icon-arrow-down el-icon--right"></i>
+          {{ $t("book.batchRemoveGroup")
+          }}<i class="el-icon-arrow-down el-icon--right"></i>
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item
@@ -157,8 +177,12 @@
           >
         </el-dropdown-menu>
       </el-dropdown>
-      <span class="check-tip">已选择 {{ manageBookSelection.length }} 个</span>
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <span class="check-tip">{{
+        $t("book.selectedCount", { count: manageBookSelection.length })
+      }}</span>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -242,21 +266,27 @@ export default {
         },
         error => {
           this.$message.error(
-            "获取书架信息失败 " + (error && error.toString())
+            this.$t("book.shelfInfoLoadFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
     },
     async deleteBookList() {
       if (!this.manageBookSelection.length) {
-        this.$message.error("请选择需要删除的书籍");
+        this.$message.error(this.$t("book.selectDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的书籍吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("book.confirmDeleteSelected"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -266,13 +296,15 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.manageBookSelection = [];
-            this.$message.success("删除书籍成功");
+            this.$message.success(this.$t("book.deleteSuccess"));
             this.loadBookCacheInfo();
             this.$root.$children[0].loadBookShelf();
           }
         },
         error => {
-          this.$message.error("删除书籍失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("book.deleteFailed", { message: error && error.toString() })
+          );
         }
       );
     },
@@ -283,19 +315,24 @@ export default {
       return this.operateBookGroupMulti(bookGroup);
     },
     async operateBookGroupMulti(bookGroup, isAdd) {
-      const operate = isAdd ? "添加" : "移除";
       if (!this.manageBookSelection.length) {
-        this.$message.error("请选择需要" + operate + "分组的书籍");
+        this.$message.error(
+          this.$t(
+            isAdd
+              ? "book.selectAddGroupRequired"
+              : "book.selectRemoveGroupRequired"
+          )
+        );
         return;
       }
       const res = await this.$confirm(
         isAdd
-          ? `确认要将所选择的书籍添加到${bookGroup.groupName}分组吗?`
-          : `确认要将所选择的书籍从${bookGroup.groupName}分组中移除吗?`,
-        "提示",
+          ? this.$t("book.confirmAddGroup", { group: bookGroup.groupName })
+          : this.$t("book.confirmRemoveGroup", { group: bookGroup.groupName }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -313,13 +350,17 @@ export default {
       ).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("操作成功");
+            this.$message.success(this.$t("common.operationSuccess"));
             this.loadBookCacheInfo();
             this.$root.$children[0].loadBookShelf();
           }
         },
         error => {
-          this.$message.error("操作失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.operationFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -377,8 +418,7 @@ export default {
         }
       };
       if (this.isCaching(book)) {
-        // 取消缓存
-        this.$message.info("已取消缓存");
+        this.$message.info(this.$t("book.cacheCancelled"));
         if (window.cacheEventSource[book.bookUrl]) {
           tryClose();
         }
@@ -412,7 +452,9 @@ export default {
         }
       });
       window.cacheEventSource[book.bookUrl].addEventListener("end", e => {
-        this.$message.info(book.name + "缓存到服务器完成");
+        this.$message.info(
+          this.$t("book.cacheServerDone", { name: book.name })
+        );
         tryClose();
         try {
           if (e.data) {
@@ -444,8 +486,7 @@ export default {
     },
     cacheBookLocal(book) {
       if (this.isCaching(book)) {
-        // 取消缓存
-        this.$message.info("已取消缓存");
+        this.$message.info(this.$t("book.cacheCancelled"));
         if (window.cacheRequestHandle[book.bookUrl]) {
           window.cacheRequestHandle[book.bookUrl].cancel();
         }
@@ -470,7 +511,7 @@ export default {
           computeCache();
         }
         if (handler.isEnd()) {
-          this.$message.success("缓存到浏览器完成");
+          this.$message.success(this.$t("book.cacheBrowserDone"));
           computeCache();
         }
       });
@@ -547,11 +588,11 @@ export default {
     },
     async deleteBookCache(book) {
       const res = await this.$confirm(
-        `确认要删除服务器上《${book.name}》的缓存章节吗?`,
-        "提示",
+        this.$t("book.confirmDeleteServerCache", { name: book.name }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -565,24 +606,26 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("删除服务器缓存成功");
+            this.$message.success(this.$t("book.deleteServerCacheSuccess"));
             this.loadBookCacheInfo();
           }
         },
         error => {
           this.$message.error(
-            "删除服务器缓存失败 " + (error && error.toString())
+            this.$t("book.deleteServerCacheFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
     },
     async deleteBookLocalCache(book) {
       const res = await this.$confirm(
-        `确认要删除浏览器中《${book.name}》的缓存章节吗?`,
-        "提示",
+        this.$t("book.confirmDeleteBrowserCache", { name: book.name }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -601,7 +644,7 @@ export default {
           return Promise.all(op);
         })
         .then(() => {
-          this.$message.success("删除浏览器缓存成功");
+          this.$message.success(this.$t("book.deleteBrowserCacheSuccess"));
           this.computeCachedCata([].concat(this.bookList)).then(v => {
             this.bookList = v;
           });

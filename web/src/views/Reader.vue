@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div
     class="chapter-wrapper"
     :style="bodyTheme"
@@ -30,7 +30,7 @@
             <div class="iconfont">
               &#58892;
             </div>
-            <div class="icon-text">书架</div>
+            <div class="icon-text">{{ $t("reader.shelf") }}</div>
           </div>
         </el-popover>
         <el-popover
@@ -53,7 +53,7 @@
             <div class="tool-el-icon">
               <i class="el-icon-menu"></i>
             </div>
-            <div class="icon-text">书源</div>
+            <div class="icon-text">{{ $t("reader.source") }}</div>
           </div>
         </el-popover>
         <el-popover
@@ -77,7 +77,7 @@
             <div class="iconfont">
               &#58905;
             </div>
-            <div class="icon-text">目录</div>
+            <div class="icon-text">{{ $t("reader.catalog") }}</div>
           </div>
         </el-popover>
         <el-popover
@@ -100,7 +100,7 @@
             <div class="iconfont">
               &#58971;
             </div>
-            <div class="icon-text">设置</div>
+            <div class="icon-text">{{ $t("reader.settings") }}</div>
           </div>
         </el-popover>
         <div
@@ -111,7 +111,7 @@
           <div class="iconfont">
             &#58920;
           </div>
-          <div class="icon-text">首页</div>
+          <div class="icon-text">{{ $t("reader.home") }}</div>
         </div>
         <div
           class="tool-icon"
@@ -121,7 +121,7 @@
           <div class="iconfont">
             &#58914;
           </div>
-          <div class="icon-text">顶部</div>
+          <div class="icon-text">{{ $t("reader.top") }}</div>
         </div>
         <div
           class="tool-icon"
@@ -131,7 +131,7 @@
           <div class="iconfont">
             &#58915;
           </div>
-          <div class="icon-text">底部</div>
+          <div class="icon-text">{{ $t("reader.bottom") }}</div>
         </div>
       </div>
     </div>
@@ -225,28 +225,28 @@
       </div>
       <div class="cache-content-zone" v-if="showCacheContentZone">
         <div>
-          缓存章节
+          {{ $t("reader.cacheChapter") }}
         </div>
         <div
           class="cache-content-btn"
           v-show="!isCachingContent"
           @click="cacheChapterContent(50)"
         >
-          后面50章
+          {{ $t("reader.cacheNext50") }}
         </div>
         <div
           class="cache-content-btn"
           v-show="!isCachingContent"
           @click="cacheChapterContent(100)"
         >
-          后面100章
+          {{ $t("reader.cacheNext100") }}
         </div>
         <div
           class="cache-content-btn"
           v-show="!isCachingContent"
           @click="cacheChapterContent(true)"
         >
-          后面全部
+          {{ $t("reader.cacheAll") }}
         </div>
         <div class="caching-tip" v-show="isCachingContent">
           {{ cachingContentTip }}
@@ -261,7 +261,9 @@
       </div>
       <div class="tools">
         <div class="tool-icon progress-text" @click="showCacheContent">
-          <span v-if="$store.state.miniInterface">阅读进度: </span>
+          <span v-if="$store.state.miniInterface">{{
+            $t("reader.progress")
+          }}</span>
           {{ readingProgress }}
         </div>
         <div
@@ -272,10 +274,14 @@
           <div class="iconfont">
             &#58920;
           </div>
-          <span v-if="$store.state.miniInterface">上一章</span>
+          <span v-if="$store.state.miniInterface">{{
+            $t("reader.previousChapter")
+          }}</span>
         </div>
         <div class="tool-icon" @click="toNextChapter()">
-          <span v-if="$store.state.miniInterface">下一章</span>
+          <span v-if="$store.state.miniInterface">{{
+            $t("reader.nextChapter")
+          }}</span>
           <div class="iconfont">
             &#58913;
           </div>
@@ -289,7 +295,9 @@
             <i class="el-icon-close"></i>
           </div>
           <div class="center">
-            <span class="ctrl-btn" @click="speechPrev">上一段</span>
+            <span class="ctrl-btn" @click="speechPrev">{{
+              $t("reader.speechPrev")
+            }}</span>
             <span class="play-pause-btn" @click="toggleSpeech">
               <i
                 class="el-icon-video-pause"
@@ -302,7 +310,9 @@
                 v-else
               ></i>
             </span>
-            <span class="ctrl-btn" @click="speechNext">下一段</span>
+            <span class="ctrl-btn" @click="speechNext">{{
+              $t("reader.speechNext")
+            }}</span>
           </div>
           <div
             class="collapse-btn"
@@ -313,7 +323,7 @@
           </div>
         </div>
         <div class="setting-item" v-if="showSpeechConfig">
-          <div class="setting-title">语音库</div>
+          <div class="setting-title">{{ $t("reader.speechLibrary") }}</div>
           <div class="setting-value">
             <div class="voice-list">
               <el-radio-group
@@ -332,10 +342,10 @@
           </div>
         </div>
         <div class="setting-item" v-if="showSpeechConfig">
-          <div class="setting-title">语音设置</div>
+          <div class="setting-title">{{ $t("reader.speechSettings") }}</div>
           <div class="setting-value">
             <div class="progress">
-              <span class="progress-tip">语速</span>
+              <span class="progress-tip">{{ $t("reader.speechRate") }}</span>
               <div class="progress-bar">
                 <el-slider
                   v-model="speechRate"
@@ -346,10 +356,12 @@
                   @change="changeSpeechRate"
                 ></el-slider>
               </div>
-              <span class="setting-btn" @click="changeSpeechRate(1)">重置</span>
+              <span class="setting-btn" @click="changeSpeechRate(1)">{{
+                $t("common.reset")
+              }}</span>
             </div>
             <div class="progress">
-              <span class="progress-tip">语调</span>
+              <span class="progress-tip">{{ $t("reader.speechPitch") }}</span>
               <div class="progress-bar">
                 <el-slider
                   v-model="speechPitch"
@@ -360,12 +372,12 @@
                   @change="changeSpeechPitch"
                 ></el-slider>
               </div>
-              <span class="setting-btn" @click="changeSpeechPitch(1)"
-                >重置</span
-              >
+              <span class="setting-btn" @click="changeSpeechPitch(1)">{{
+                $t("common.reset")
+              }}</span>
             </div>
             <div class="progress">
-              <span class="progress-tip">定时</span>
+              <span class="progress-tip">{{ $t("reader.speechTimer") }}</span>
               <div class="progress-bar">
                 <el-slider
                   v-model="speechMinutes"
@@ -376,7 +388,9 @@
                   @change="changeSpeechMinutes"
                 ></el-slider>
               </div>
-              <span class="setting-btn">{{ speechMinutes }}分钟</span>
+              <span class="setting-btn"
+                >{{ speechMinutes }}{{ $t("common.minutes") }}</span
+              >
             </div>
           </div>
         </div>
@@ -393,10 +407,18 @@
         v-if="showClickZone"
         :style="!isSlideRead ? { position: 'fixed' } : {}"
       >
-        <div :style="showPrevPageStyle"><span>点击前一页</span></div>
-        <div :style="showMenuZoneStyle"><span>点击显示菜单</span></div>
-        <div :style="showNextPageStyle"><span>点击后一页</span></div>
-        <div class="close-btn" @click="showClickZone = false">关闭</div>
+        <div :style="showPrevPageStyle">
+          <span>{{ $t("reader.clickPrevPage") }}</span>
+        </div>
+        <div :style="showMenuZoneStyle">
+          <span>{{ $t("reader.clickMenu") }}</span>
+        </div>
+        <div :style="showNextPageStyle">
+          <span>{{ $t("reader.clickNextPage") }}</span>
+        </div>
+        <div class="close-btn" @click="showClickZone = false">
+          {{ $t("common.close") }}
+        </div>
       </div>
       <div class="top-bar" ref="top">
         {{ $store.state.miniInterface ? title : "" }}
@@ -433,14 +455,18 @@
       </div>
       <div class="bottom-bar" ref="bottom">
         <span v-if="isSlideRead">{{
-          `第${currentPage}/${totalPages}页 ${readingProgress}`
+          $t("reader.pageStatus", {
+            current: currentPage,
+            total: totalPages,
+            progress: readingProgress
+          })
         }}</span>
         <span v-if="isSlideRead">{{ timeStr }}</span>
         <span
           class="bottom-btn"
           v-if="show && !isSlideRead && !error && !isScrollRead"
           @click="toNextChapter()"
-          >加载下一章</span
+          >{{ $t("reader.loadNextChapter") }}</span
         >
       </div>
     </div>
@@ -651,7 +677,6 @@ export default {
       }
     },
     currentPage(val, oldVal) {
-      // 还剩两页的时候，预读下一章节
       if (val !== oldVal && val >= this.totalPages - 2) {
         if (
           this.$store.getters.readingBook.index <
@@ -781,8 +806,8 @@ export default {
         !this.isEpub &&
         !this.isAudio &&
         !this.isSlideRead &&
-        (this.config.readMethod === "上下滚动" ||
-          this.config.readMethod === "上下滚动2")
+        (this.config.readMethod === "verticalScroll" ||
+          this.config.readMethod === "verticalScroll2")
       );
     },
     chapterClass() {
@@ -881,7 +906,6 @@ export default {
     },
     showPrevPageStyle() {
       if (this.isSlideRead) {
-        // 左半部
         return {
           left: 0,
           top: 0,
@@ -891,7 +915,6 @@ export default {
           paddingRight: this.windowSize.width * 0.2 + "px"
         };
       } else {
-        // 上半部
         return {
           left: 0,
           top: 0,
@@ -913,7 +936,6 @@ export default {
     },
     showNextPageStyle() {
       if (this.isSlideRead) {
-        // 右半部
         return {
           right: 0,
           top: 0,
@@ -923,7 +945,6 @@ export default {
           paddingLeft: this.windowSize.width * 0.2 + "px"
         };
       } else {
-        // 下半部
         return {
           left: 0,
           bottom: 0,
@@ -1030,7 +1051,6 @@ export default {
       );
     },
     scrollOffset() {
-      // 两行 + 两个段间距
       return (
         this.$store.getters.config.fontSize *
           this.$store.getters.config.lineHeight *
@@ -1061,12 +1081,11 @@ export default {
           this.loading = this.$loading({
             target: this.$refs.content,
             lock: true,
-            text: "正在获取内容",
+            text: this.$t("reader.loadingContent"),
             spinner: "el-icon-loading",
             background: "rgba(0,0,0,0)"
           });
           this.lastReadingBook = this.$store.getters.readingBook;
-          // 跳转记住的位置
           this.autoShowPosition();
           this.loadCatalog(false, true);
         } else {
@@ -1077,7 +1096,6 @@ export default {
               this.autoShowPosition(true);
             });
           } else if (this.isEpub) {
-            // 跳转记住的位置
             this.autoShowPosition(true);
           } else {
             this.startSavePosition = true;
@@ -1088,11 +1106,11 @@ export default {
           }, 100);
         }
       } else {
-        this.$message.error("请在书架选择书籍");
+        this.$message.error(this.$t("reader.selectBookFromShelf"));
       }
     },
     changeBook(book) {
-      this.$message.info("换书成功");
+      this.$message.info(this.$t("reader.changeBookSuccess"));
       this.popBookShelfVisible = false;
       this.show = false;
       this.$store.commit("setReadingBook", book);
@@ -1102,7 +1120,6 @@ export default {
       this.popBookSourceVisible = false;
       this.show = false;
       this.tryRefresh = false;
-      // TODO 使用相似度比较，校正章节index
       this.loadCatalog(true, true);
     },
     loadCatalog(refresh, init) {
@@ -1126,7 +1143,9 @@ export default {
           } else {
             if (init) {
               this.title = "";
-              this.content = "获取章节目录失败！\n" + res.data.errorMsg;
+              this.content = this.$t("reader.catalogLoadFailed", {
+                message: res.data.errorMsg
+              });
               this.error = true;
               this.show = true;
               this.$emit("showContent");
@@ -1137,7 +1156,9 @@ export default {
         error => {
           this.loading.close();
           this.$message.error(
-            "获取书籍目录列表 " + (error && error.toString())
+            this.$t("reader.catalogListLoadFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -1148,7 +1169,6 @@ export default {
         refresh: refresh ? 1 : 0
       };
       if (this.$route.query.search) {
-        // 来自搜索结果，请求需要带上 书源链接
         params.bookSourceUrl = this.$store.getters.readingBook.origin;
       }
       return networkFirstRequest(
@@ -1176,20 +1196,20 @@ export default {
       this.getContent(this.$store.getters.readingBook.index, true);
     },
     getContent(index, refresh) {
-      //展示进度条
       this.show = false;
       if (!this.loading || !this.loading.visible) {
         this.loading = this.$loading({
           target: this.$refs.content,
           lock: true,
-          text: refresh ? "正在刷新内容" : "正在获取内容",
+          text: refresh
+            ? this.$t("reader.refreshingContent")
+            : this.$t("reader.loadingContent"),
           spinner: "el-icon-loading",
           background: "rgba(0,0,0,0)"
         });
       }
       let bookUrl = this.$store.getters.readingBook.bookUrl;
       try {
-        // 保存阅读进度
         let book = { ...this.$store.getters.readingBook };
         book.index = index;
         this.$store.commit("setReadingBook", book);
@@ -1197,13 +1217,11 @@ export default {
         // eslint-disable-next-line no-console
         console.error(error);
       }
-      //强制滚回顶层
       this.toTop(0);
-      // 如果超出目录范围，尝试刷新目录
       if (!this.$store.getters.readingBook.catalog[index]) {
         if (this.tryRefresh) {
           this.tryRefresh = false;
-          this.content = "获取章节内容失败，请更新目录！";
+          this.content = this.$t("reader.contentLoadRefreshCatalog");
           this.error = true;
           this.show = true;
           this.$emit("showContent");
@@ -1225,11 +1243,9 @@ export default {
             bookUrl !== this.$store.getters.readingBook.bookUrl ||
             index !== this.$store.getters.readingBook.index
           ) {
-            // 已经换书或者换章节了
             return;
           }
           if (now + 100 > new Date().getTime()) {
-            // 不超过 100ms 假定为获取缓存，此时发送进度保存请求
             this.saveBookProgress();
           }
           if (res.data.isSuccess) {
@@ -1247,12 +1263,16 @@ export default {
             this.show = true;
             this.$emit("showContent");
           } else {
-            this.content = "获取章节内容失败！\n" + res.data.errorMsg;
+            this.content = this.$t("reader.chapterContentLoadFailed", {
+              message: res.data.errorMsg
+            });
             this.addChapterContentToCache({
               bookUrl,
               index: index,
               title: chapterName,
-              content: "获取章节内容失败！\n" + res.data.errorMsg,
+              content: this.$t("reader.chapterContentLoadFailed", {
+                message: res.data.errorMsg
+              }),
               error: true
             });
             this.error = true;
@@ -1269,15 +1289,18 @@ export default {
             bookUrl !== this.$store.getters.readingBook.bookUrl ||
             index !== this.$store.getters.readingBook.index
           ) {
-            // 已经换书或者换章节了
             return;
           }
-          this.content = "获取章节内容失败！\n" + (error && error.toString());
+          this.content = this.$t("reader.chapterContentLoadFailed", {
+            message: error && error.toString()
+          });
           this.addChapterContentToCache({
             bookUrl,
             index: index,
             title: chapterName,
-            content: "获取章节内容失败！\n" + (error && error.toString()),
+            content: this.$t("reader.chapterContentLoadFailed", {
+              message: error && error.toString()
+            }),
             error: true
           });
           this.error = true;
@@ -1285,7 +1308,9 @@ export default {
           this.$emit("showContent");
           this.loading.close();
           this.$message.error(
-            "获取章节内容失败 " + (error && error.toString())
+            this.$t("reader.chapterContentLoadFailedInline", {
+              message: error && error.toString()
+            })
           );
           if (this.isScrollRead) {
             this.computeShowChapterList();
@@ -1360,9 +1385,8 @@ export default {
           });
         });
       }
-      // 如果超出目录范围，尝试刷新目录
       if (!this.$store.getters.readingBook.catalog[index]) {
-        return Promise.reject("章节不存在");
+        return Promise.reject(this.$t("reader.chapterNotFound"));
       }
       let chapterName = this.$store.getters.readingBook.catalog[index].title;
       let chapterIndex = this.$store.getters.readingBook.catalog[index].index;
@@ -1381,7 +1405,9 @@ export default {
               bookUrl,
               index: index,
               title: chapterName,
-              content: "获取章节内容失败！\n" + res.data.errorMsg,
+              content: this.$t("reader.chapterContentLoadFailed", {
+                message: res.data.errorMsg
+              }),
               error: true
             });
           }
@@ -1391,7 +1417,9 @@ export default {
             bookUrl,
             index: index,
             title: chapterName,
-            content: "获取章节内容失败！\n" + (error && error.toString()),
+            content: this.$t("reader.chapterContentLoadFailed", {
+              message: error && error.toString()
+            }),
             error: true
           });
           throw error;
@@ -1410,11 +1438,10 @@ export default {
       }
       if (
         typeof this.chapterContentCache.chapters[chapter.index] ===
-          "undefined" || // 没有缓存
-        !chapter.error || // 当前内容正确
-        this.chapterContentCache.chapters[chapter.index].error // 缓存内容错误
+          "undefined" ||
+        !chapter.error ||
+        this.chapterContentCache.chapters[chapter.index].error
       ) {
-        // 查询是否卷名
         chapter.isVolume = !!(this.readingBook.catalog[chapter.index] || {})
           .isVolume;
         this.chapterContentCache.chapters[chapter.index] = chapter;
@@ -1433,7 +1460,7 @@ export default {
       }
       const list = [];
       let startIndex = this.scrollStartChapterIndex || this.chapterIndex;
-      if (this.config.readMethod === "上下滚动2") {
+      if (this.config.readMethod === "verticalScroll2") {
         startIndex = this.chapterIndex - this.showPrevChapterSize;
       }
       const waitPromise = [];
@@ -1459,17 +1486,14 @@ export default {
         });
       }
       this.saveReadingPosition();
-      // 暂停记录位置
       this.startSavePosition = false;
-      // 记录当前章节
       this.showChapterList = list;
       this.$nextTick(() => {
         this.computePages(() => {
           if (reset) {
-            // 切换上下章节，滚动到顶部
             this.toTop(0);
             this.startSavePosition = true;
-          } else if (this.config.readMethod === "上下滚动2") {
+          } else if (this.config.readMethod === "verticalScroll2") {
             this.autoShowPosition(true);
           } else {
             this.startSavePosition = true;
@@ -1524,7 +1548,7 @@ export default {
         this.getContent(index);
       } else {
         onError && onError();
-        this.$message.error("本章是最后一章");
+        this.$message.error(this.$t("reader.lastChapter"));
       }
     },
     toLastChapter(onError) {
@@ -1548,7 +1572,7 @@ export default {
         }
         this.getContent(index);
       } else {
-        this.$message.error("本章是第一章");
+        this.$message.error(this.$t("reader.firstChapter"));
         onError && onError();
       }
     },
@@ -1603,7 +1627,6 @@ export default {
         } else {
           this.toNextChapter(() => {
             if (typeof moveX !== "undefined") {
-              // 没有下一章，但是已经做了动画，恢复
               this.showPage(this.currentPage, 0);
             }
           });
@@ -1647,7 +1670,6 @@ export default {
           this.showLastPage = true;
           this.toLastChapter(() => {
             if (typeof moveX !== "undefined") {
-              // 没有下一章，但是已经做了动画，恢复
               this.showPage(this.currentPage, 0);
             }
           });
@@ -1696,7 +1718,6 @@ export default {
         };
         this.transformX += moveX;
         this.transforming = false;
-        // 保存进度
         setTimeout(this.saveReadingPosition, duration);
       };
       if (!duration) {
@@ -1727,7 +1748,6 @@ export default {
         document.documentElement.scrollTop = lastScrollTop + moveY;
         document.body.scrollTop = lastScrollTop + moveY;
         this.transforming = false;
-        // 保存进度
         setTimeout(this.saveReadingPosition, duration);
       };
       if (!duration) {
@@ -1807,10 +1827,8 @@ export default {
       if (this.lastMoveX) {
         this.transformX += this.lastMoveX;
         if (this.lastMoveX > 0) {
-          // 上一页
           this.prevPage(this.windowSize.width - 16 - this.lastMoveX);
         } else {
-          // 下一页
           this.nextPage(-(this.windowSize.width - 16) - this.lastMoveX);
         }
       } else if (Math.abs(this.lastMoveY) <= 3 && this.lastTouch) {
@@ -1843,7 +1861,6 @@ export default {
         return decodeURIComponent(a.pathname);
       }
       url = getPathname(url);
-      // 判断是否跳转了其他章节
       const currentChapter = this.catalog[this.chapterIndex];
       if (currentChapter) {
         const chapterPrefix = this.content.replace(currentChapter.url, "");
@@ -1868,7 +1885,6 @@ export default {
     eventHandler(point) {
       // console.log(point);
       if (this.checkSelection(true)) {
-        // 选择文本
         this.ignoreNextClick = true;
         return;
       }
@@ -1887,8 +1903,6 @@ export default {
         return;
       }
       if (this.isAudio) {
-        // 音频
-        // 点击中部区域显示菜单
         if (!this.showReadBar) {
           this.showToolBar = !this.showToolBar;
         }
@@ -1898,7 +1912,6 @@ export default {
         this.showToolBar = !this.showToolBar;
         return;
       }
-      // 根据点击位置判断操作
       const midX = this.windowSize.width / 2;
       const midY = this.windowSize.height / 2;
       if (this.isEpub) {
@@ -1911,36 +1924,29 @@ export default {
         Math.abs(point.clientY - midY) <= this.windowSize.height * 0.2 &&
         Math.abs(point.clientX - midX) <= this.windowSize.width * 0.2
       ) {
-        // 点击中部区域显示菜单
         if (!this.showReadBar) {
           this.showToolBar = !this.showToolBar;
         }
-      } else if (this.$store.getters.config.clickMethod === "下一页") {
-        // 全屏点击下一页
+      } else if (this.$store.getters.config.clickMethod === "nextPage") {
         this.showToolBar = false;
         this.nextPage();
         return;
-      } else if (this.$store.getters.config.clickMethod === "不翻页") {
-        // 全屏点击不翻页
+      } else if (this.$store.getters.config.clickMethod === "noTurn") {
         this.showToolBar = !this.showToolBar;
         return;
       } else if (this.isSlideRead) {
         if (point.clientX > midX) {
-          // 点击右侧，下一页
           this.showToolBar = false;
           this.nextPage();
         } else if (point.clientX < midX) {
-          // 点击左侧，上一页
           this.showToolBar = false;
           this.prevPage();
         }
       } else {
         if (point.clientY > midY) {
-          // 点击下部，下一页
           this.showToolBar = false;
           this.nextPage();
         } else if (point.clientY < midY) {
-          // 点击上部，上一页
           this.showToolBar = false;
           this.prevPage();
         }
@@ -2010,7 +2016,10 @@ export default {
       }
     },
     formatProgressTip(value) {
-      return `第 ${value || this.progressValue}/${this.totalPages} 页`;
+      return this.$t("reader.pageLabel", {
+        current: value || this.progressValue,
+        total: this.totalPages
+      });
     },
     formatTime() {
       const now = new Date();
@@ -2027,8 +2036,7 @@ export default {
       if (text && show) {
         setTimeout(() => {
           if (
-            this.$store.getters.config.selectionAction === "过滤弹窗" ||
-            this.$store.getters.config.selectionAction === "操作弹窗"
+            this.$store.getters.config.selectionAction === "actionPopup"
           ) {
             this.showTextOperate(text);
           }
@@ -2037,14 +2045,18 @@ export default {
       return text;
     },
     async showTextOperate(text) {
-      const res = await this.$confirm(`请选择操作?`, "提示", {
-        confirmButtonText: "添加过滤规则",
-        cancelButtonText: "添加书签",
-        type: "warning",
-        closeOnClickModal: false,
-        closeOnPressEscape: false,
-        distinguishCancelAndClose: true
-      }).catch(action => {
+      const res = await this.$confirm(
+        this.$t("reader.selectAction"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("reader.addFilterRule"),
+          cancelButtonText: this.$t("reader.addBookmark"),
+          type: "warning",
+          closeOnClickModal: false,
+          closeOnPressEscape: false,
+          distinguishCancelAndClose: true
+        }
+      ).catch(action => {
         return action === "close" ? "close" : false;
       });
       if (res === "close") {
@@ -2065,7 +2077,7 @@ export default {
       }
 
       const replaceRule = Object.assign({}, defaultReplaceRule, {
-        name: "文本替换",
+        name: this.$t("replaceRule.textReplacement"),
         pattern: text,
         replacement: "",
         isRegex: false,
@@ -2094,12 +2106,9 @@ export default {
       // );
       // const result = await this.$prompt(
       //   h("div", null, [
-      //     h("p", null, "是否要将下列文字替换为输入内容:"),
       //     preEle
       //   ]),
-      //   "操作确认",
       //   {
-      //     inputPlaceholder: "留空为过滤"
       //   }
       // ).catch(() => {});
       // if (result && result.action === "confirm") {
@@ -2108,7 +2117,6 @@ export default {
       //     .replace(/\s+$/, "");
       //   if (text) {
       //     this.$store.commit("addFilterRule", {
-      //       name: "文本替换",
       //       pattern: text,
       //       replacement: result.value || "",
       //       isRegex: false,
@@ -2119,7 +2127,6 @@ export default {
       //         this.$store.getters.readingBook.bookUrl
       //     });
       //   } else {
-      //     this.$message.error("过滤内容为空!");
       //   }
       // }
       // this.showTextFilterPrompting = false;
@@ -2132,7 +2139,7 @@ export default {
       // console.log(pureText);
       const paragraph = this.getContentMatchParagraph(pureText, 1, 0.7);
       if (!paragraph) {
-        this.$message.error("选择1-2段整段文字才能定位段落");
+        this.$message.error(this.$t("reader.selectParagraphTip"));
         return;
       }
       const paragraphLength = 5;
@@ -2143,7 +2150,6 @@ export default {
         paragraphList.length < paragraphLength &&
         bookText.length < paragraphTextLength
       ) {
-        // 补全内容
         let paragraphIndex = -1;
         const list = this.$refs.bookContentRef.$el.querySelectorAll("h3,p");
         for (let i = 0; i < list.length; i++) {
@@ -2232,7 +2238,7 @@ export default {
           this.speechEndTime > 0 &&
           new Date().getTime() > this.speechEndTime
         ) {
-          this.$message.info("定时关闭朗读");
+          this.$message.info(this.$t("reader.timedSpeechClosed"));
           return;
         }
       }
@@ -2249,7 +2255,6 @@ export default {
         this.skipAutoNext = false;
       };
       this.utterance.onend = () => {
-        // 下一段
         if (!this.skipAutoNext) {
           this.speechNext();
         } else {
@@ -2260,9 +2265,11 @@ export default {
       this.utterance.onerror = event => {
         if (event.error || event.name) {
           this.$message.error(
-            `朗读错误:  ${event.type || ""}  ${event.error ||
-              event.name ||
-              event.toString()}`
+            this.$t("reader.speechError", {
+              message: `${event.type || ""} ${event.error ||
+                event.name ||
+                event.toString()}`
+            })
           );
         }
         this.speechSpeaking = window.speechSynthesis.speaking || false;
@@ -2309,7 +2316,6 @@ export default {
         prev.className = "reading";
         this.startSpeech();
       } else {
-        // 上一章
         this.$once("showContent", () => {
           setTimeout(() => {
             this.startSpeech();
@@ -2330,7 +2336,6 @@ export default {
         next.className = "reading";
         this.startSpeech();
       } else {
-        // 下一章
         this.$once("showContent", () => {
           setTimeout(() => {
             this.startSpeech();
@@ -2345,18 +2350,15 @@ export default {
       );
       let currentParagraph = null;
       if (!readingEle.length) {
-        // 没有正在读的段落，遍历找到当前页面的第一段
         const list = this.$refs.bookContentRef.$el.querySelectorAll("h3,p");
         for (let i = 0; i < list.length; i++) {
           const elePos = list[i].getBoundingClientRect();
           if (this.isSlideRead) {
-            // 段尾出现在视野里
             if (elePos.right > 0) {
               currentParagraph = list[i];
               break;
             }
           } else {
-            // 段尾出现在视野里
             if (
               elePos.bottom >
               30 +
@@ -2405,7 +2407,6 @@ export default {
         return;
       }
       if (this.isSlideRead) {
-        // 跳转位置
         this.$nextTick(() => {
           const pos = paragraph.getBoundingClientRect();
           if (pos.left > this.windowSize.width - 16) {
@@ -2416,7 +2417,6 @@ export default {
           }
         });
       } else if (scroll) {
-        // 跳转位置
         this.$nextTick(() => {
           const pos = paragraph.getBoundingClientRect();
           this.scrollContent(
@@ -2446,7 +2446,6 @@ export default {
       if (this.isScrollRead) {
         const lastScrollTop = this.lastScrollTop || 0;
         if (lastScrollTop > 0 && scrollTop == 0) {
-          // 往上滚动到顶
           // if (!this.preCaching) {
           //   this.preCaching = true;
           //   const prevIndex = this.showChapterList[0].index - 1;
@@ -2461,9 +2460,8 @@ export default {
           // }
         } else if (
           scrollTop >
-          document.documentElement.scrollHeight - 2 * this.windowSize.height // 倒数第三页
+          document.documentElement.scrollHeight - 2 * this.windowSize.height
         ) {
-          // 往下滚动到 倒数第三页
           if (!this.preCaching && this.startSavePosition) {
             this.preCaching = true;
             let nextIndex = this.chapterIndex + 1;
@@ -2472,7 +2470,6 @@ export default {
                 this.showChapterList[this.showChapterList.length - 1].index + 1;
             }
             this.showNextChapterSize = nextIndex - this.chapterIndex;
-            // console.log("到底部了，加载下一章");
             this.loadShowChapter(nextIndex)
               .then(() => {
                 this.computeShowChapterList();
@@ -2491,7 +2488,6 @@ export default {
     beforeReadMethodChange() {
       this.currentParagraph = this.getCurrentParagraph();
     },
-    // 只会在进入的时候调用
     showPosition(pos, callback) {
       if (this.isAudio) {
         // seek
@@ -2503,7 +2499,6 @@ export default {
         }
         this.$refs.bookContentRef.ensureSeekTime(pos);
       } else if (this.isEpub || this.isCarToon) {
-        // 跳转
         this.scrollContent(pos, 0, true);
         if (this.isEpub) {
           this.$once("iframeLoad", () => {
@@ -2548,13 +2543,11 @@ export default {
           position =
             document.documentElement.scrollTop || document.body.scrollTop;
         } else {
-          // 更新当前章节 和 当前段落
           if (this.preCaching) {
             return;
           }
           this.currentParagraph = this.getCurrentParagraph();
           if (this.currentParagraph) {
-            // 找到最近的 .chapter-content
             let currentChapter = this.currentParagraph;
             while (currentChapter.className.indexOf("chapter-content") < 0) {
               currentChapter = currentChapter.parentNode;
@@ -2572,7 +2565,6 @@ export default {
                   let book = { ...this.$store.getters.readingBook };
                   book.index = chapterIndex;
                   this.$store.commit("setReadingBook", book);
-                  // 保存阅读进度
                   this.saveBookProgress();
                   this.title = this.$store.getters.readingBook.catalog[
                     chapterIndex
@@ -2728,19 +2720,21 @@ export default {
         );
       }
       if (!cacheChapterList.length) {
-        this.$message.error("不需要缓存");
+        this.$message.error(this.$t("reader.noCacheNeeded"));
         return;
       }
       this.isCachingContent = true;
-      this.cachingContentTip = "正在缓存章节  0/" + cacheChapterList.length;
+      this.cachingContentTip = this.$t("reader.cachingChapter", {
+        current: 0,
+        total: cacheChapterList.length
+      });
       this.cachingHandler = LimitResquest(2, handler => {
-        this.cachingContentTip =
-          "正在缓存章节  " +
-          handler.requestCount +
-          "/" +
-          cacheChapterList.length;
+        this.cachingContentTip = this.$t("reader.cachingChapter", {
+          current: handler.requestCount,
+          total: cacheChapterList.length
+        });
         if (handler.isEnd()) {
-          this.$message.success("缓存完成");
+          this.$message.success(this.$t("reader.cacheDone"));
           this.isCachingContent = false;
           this.cachingContentTip = "";
         }
@@ -2781,7 +2775,7 @@ export default {
         }, 300);
         return;
       }
-      if (this.config.autoReadingMethod === "像素滚动") {
+      if (this.config.autoReadingMethod === "pixelScroll") {
         this.autoReadByPixel();
         return;
       }
@@ -2790,7 +2784,6 @@ export default {
       if (next) {
         current.className = "reading";
         next.className = "";
-        // 计算当前段落
         let delayTime = this.config.autoReadingLineTime;
         try {
           const currentPos = current.getBoundingClientRect();
@@ -2813,7 +2806,6 @@ export default {
           }, 32);
         }, delayTime);
       } else {
-        // 下一章
         this.$once("showContent", () => {
           setTimeout(() => {
             this.autoRead();
@@ -2834,7 +2826,7 @@ export default {
         }, 300);
         return;
       }
-      if (this.config.autoReadingMethod !== "像素滚动") {
+      if (this.config.autoReadingMethod !== "pixelScroll") {
         this.autoRead();
         return;
       }
@@ -2846,12 +2838,10 @@ export default {
       ) {
         // console.log(delayTime, next);
         this.autoReadingTimer = setTimeout(() => {
-          // 滚动
           this.scrollContent(this.config.autoReadingPixel, 0);
           this.autoReadByPixel();
         }, this.config.autoReadingLineTime);
       } else {
-        // 下一章
         this.$once("showContent", () => {
           setTimeout(() => {
             this.autoReadByPixel();
@@ -2889,7 +2879,7 @@ export default {
       if (this.isEpub || this.isAudio || this.isCbz || this.isCarToon) {
         return text;
       }
-      if (this.config.chineseFont === "简体") {
+      if (this.config.chineseFont === "simplified") {
         return simplized(text);
       } else {
         return traditionalized(text);
@@ -2945,18 +2935,15 @@ export default {
       }
     },
     getParagraphListInView() {
-      // 获取视口内的所有段落
       const list = this.$refs.bookContentRef.$el.querySelectorAll("h3,p");
       const paragraphList = [];
       for (let i = 0; i < list.length; i++) {
         const elePos = list[i].getBoundingClientRect();
         if (this.isSlideRead) {
-          // 段尾出现在视野里
           if (elePos.right > 0 && elePos.left > 0) {
             paragraphList.push(list[i]);
           }
         } else {
-          // 段尾出现在视野里
           if (
             elePos.bottom >
               30 +
@@ -2981,7 +2968,6 @@ export default {
     },
     getContentMatchParagraph(text, distance, minDistance) {
       distance = distance || 0.7;
-      // 正则过滤标点符号后，近似匹配每一段内容
       let paragraphList = text
         .replace(/\\n+/g, "\n")
         .split(/\n+/)
@@ -2997,7 +2983,6 @@ export default {
           let pos = 0;
           let startPos = i;
           for (let j = 0; j < paragraphList.length; j++) {
-            // 过滤所有字符
             let content = null;
             while (i + pos < list.length) {
               content = list[i + pos].innerText.replace(symboRegex, "");
@@ -3009,7 +2994,6 @@ export default {
               }
             }
             if (!content) {
-              // 说明没找到有内容的段落，终止匹配
               isMatch = false;
               break;
             }
@@ -3050,7 +3034,7 @@ export default {
       if (paragraph) {
         this.showParagraph(paragraph, true);
       } else {
-        this.$message.error("无法定位内容所在段落");
+        this.$message.error(this.$t("reader.locateParagraphFailed"));
       }
     },
     showBookmark(bookmark) {

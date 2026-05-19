@@ -16,7 +16,7 @@
         <span class="title-input">
           <el-input
             size="mini"
-            placeholder="搜索书籍内容"
+            :placeholder="$t('contentSearch.placeholder')"
             v-model="keyword"
             class="search-input"
             @keyup.enter.native="searchBookContent(-1)"
@@ -33,12 +33,16 @@
         :height="dialogContentHeight"
         @row-click="clickRow"
       >
-        <el-table-column property="chapterTitle" min-width="100px" label="章节">
+        <el-table-column
+          property="chapterTitle"
+          min-width="100px"
+          :label="$t('book.chapter')"
+        >
         </el-table-column>
         <el-table-column
           property="resultText"
           min-width="250px"
-          label="搜索结果"
+          :label="$t('contentSearch.result')"
         >
         </el-table-column>
       </el-table>
@@ -50,7 +54,9 @@
         class="float-left"
         :disabled="loading"
         @click="searchBookContent(lastIndex)"
-        >{{ loading ? "加载中" : "加载更多" }}</el-button
+        >{{
+          loading ? $t("contentSearch.loading") : $t("contentSearch.loadMore")
+        }}</el-button
       >
       <el-button
         type="primary"
@@ -58,9 +64,11 @@
         class="float-left"
         v-if="lastScrollTop > 0"
         @click="restoreScrollTop"
-        >跳转上次位置</el-button
+        >{{ $t("contentSearch.jumpLastPosition") }}</el-button
       >
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -165,7 +173,11 @@ export default {
         },
         error => {
           this.loading = false;
-          this.$message.error("加载失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.loadFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },

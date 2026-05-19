@@ -1,1 +1,5 @@
 *.java linguist-language=Kotlin
+* text=auto working-tree-encoding=UTF-8
+*.bat text eol=crlf working-tree-encoding=UTF-8
+*.cmd text eol=crlf working-tree-encoding=UTF-8
+*.sh text eol=lf working-tree-encoding=UTF-8

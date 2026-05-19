@@ -1,4 +1,4 @@
-// import { Message } from "element-ui";
+﻿// import { Message } from "element-ui";
 import { getCache } from "../plugins/cache";
 
 export const formatSize = function(value, scale) {
@@ -76,8 +76,6 @@ export const LimitResquest = function(limit, process) {
 export const networkFirstRequest = async function(requestFunc, cacheKey) {
   cacheKey = "localCache@" + cacheKey;
   const res = await requestFunc().catch(() => {
-    // 请求出错，使用缓存
-    // 使用新的异步存储
     return window.$cacheStorage
       .getItem(cacheKey)
       .then(cacheResponse => {
@@ -86,7 +84,6 @@ export const networkFirstRequest = async function(requestFunc, cacheKey) {
         }
       })
       .catch(err => {
-        // 兼容旧逻辑
         const cacheResponse = getCache(cacheKey);
         if (cacheResponse) {
           return { data: cacheResponse };
@@ -95,7 +92,6 @@ export const networkFirstRequest = async function(requestFunc, cacheKey) {
       });
   });
   if (res.data && res.data.isSuccess) {
-    // 使用新的异步存储
     window.$cacheStorage.setItem(cacheKey, res.data).catch(() => {});
   }
   return res;
@@ -107,7 +103,6 @@ export const cacheFirstRequest = async function(
   validateCache
 ) {
   cacheKey = "localCache@" + cacheKey;
-  // validateCache === true 时，直接刷新缓存
   if (validateCache !== true) {
     let cacheResponse = await window.$cacheStorage
       .getItem(cacheKey)
@@ -119,7 +114,6 @@ export const cacheFirstRequest = async function(
         throw new Error("Cache not found");
       })
       .catch(() => {
-        // 兼容旧逻辑
         const cacheResponse = getCache(cacheKey);
         return cacheResponse;
       });
@@ -131,7 +125,6 @@ export const cacheFirstRequest = async function(
   }
   const res = await requestFunc();
   if (res.data && res.data.isSuccess) {
-    // 使用新的异步存储
     window.$cacheStorage.setItem(cacheKey, res.data).catch(() => {});
   }
   return res;
@@ -178,7 +171,6 @@ export const loadFont = function(fontName, fontUrl) {
     !window.customFonts[fontName] ||
     window.customFonts[fontName] !== fontUrl
   ) {
-    // 动态插入CSS
     const style = document.createElement("style");
     style.textContent = `
     @font-face {

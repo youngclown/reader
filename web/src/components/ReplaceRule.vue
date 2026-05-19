@@ -1,6 +1,6 @@
-<template>
+﻿<template>
   <el-dialog
-    title="替换规则管理"
+    :title="$t('replaceRule.manage')"
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -13,8 +13,10 @@
   >
     <div class="custom-dialog-title" slot="title">
       <span class="el-dialog__title"
-        >替换规则管理
-        <span class="float-right span-btn" @click="uploadFile">导入</span>
+        >{{ $t("replaceRule.manage") }}
+        <span class="float-right span-btn" @click="uploadFile">{{
+          $t("common.import")
+        }}</span>
         <input
           ref="fileRef"
           type="file"
@@ -38,13 +40,21 @@
         <el-table-column
           property="name"
           min-width="150px"
-          label="规则名称"
+          :label="$t('replaceRule.ruleName')"
           :fixed="$store.state.miniInterface"
         >
         </el-table-column>
-        <el-table-column property="scope" label="替换范围" min-width="150px">
+        <el-table-column
+          property="scope"
+          :label="$t('replaceRule.scope')"
+          min-width="150px"
+        >
         </el-table-column>
-        <el-table-column property="isEnabled" label="是否启用" min-width="80">
+        <el-table-column
+          property="isEnabled"
+          :label="$t('replaceRule.enabled')"
+          min-width="80"
+        >
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.isEnabled"
@@ -57,11 +67,11 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
-            <el-button type="text" @click="editReplaceRule(scope.row)"
-              >编辑</el-button
-            >
+            <el-button type="text" @click="editReplaceRule(scope.row)">{{
+              $t("common.edit")
+            }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -72,10 +82,14 @@
         size="medium"
         class="float-left"
         @click="deleteReplaceRules"
-        >批量删除</el-button
+        >{{ $t("book.batchDelete") }}</el-button
       >
-      <span class="check-tip">已选择 {{ localSelection.length }} 个</span>
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <span class="check-tip">{{
+        $t("common.selectedCount", { count: localSelection.length })
+      }}</span>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -119,14 +133,18 @@ export default {
     },
     async deleteReplaceRules() {
       if (!this.localSelection.length) {
-        this.$message.error("请选择需要删除的替换规则");
+        this.$message.error(this.$t("replaceRule.selectDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的替换规则吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("replaceRule.confirmDeleteSelected"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -136,13 +154,15 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.localSelection = [];
-            this.$message.success("删除替换规则成功");
+            this.$message.success(this.$t("replaceRule.deleteSuccess"));
             this.$root.$children[0].loadReplaceRules(true);
           }
         },
         error => {
           this.$message.error(
-            "删除替换规则失败 " + (error && error.toString())
+            this.$t("replaceRule.deleteFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -151,12 +171,14 @@ export default {
       Axios.post("/saveReplaceRule", { ...rule, isEnabled }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("修改成功");
+            this.$message.success(this.$t("common.editSuccess"));
             this.$root.$children[0].loadReplaceRules(true);
           }
         },
         error => {
-          this.$message.error("修改失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.editFailed", { message: error && error.toString() })
+          );
         }
       );
     },
@@ -178,12 +200,11 @@ export default {
             this.comfirmImport(ruleList);
           }
         } catch (error) {
-          this.$message.error("替换规则文件错误");
+          this.$message.error(this.$t("replaceRule.fileError"));
         }
       };
       reader.onerror = () => {
         // console.log("FileReader error", e);
-        // FileReader 读取出错，只能上传读取了
         let param = new FormData();
         param.append("file", rawFile);
         Axios.post(this.api + "/readSourceFile", param, {
@@ -206,13 +227,15 @@ export default {
               if (ruleList.length) {
                 this.comfirmImport(ruleList);
               } else {
-                this.$message.error("替换规则文件错误");
+                this.$message.error(this.$t("replaceRule.fileError"));
               }
             }
           },
           error => {
             this.$message.error(
-              "读取替换规则文件内容失败 " + (error && error.toString())
+              this.$t("replaceRule.fileReadFailed", {
+                message: error && error.toString()
+              })
             );
           }
         );
@@ -222,11 +245,13 @@ export default {
     },
     async comfirmImport(ruleList) {
       const res = await this.$confirm(
-        `确认要导入文件中的${ruleList.length}条替换规则吗?`,
-        "提示",
+        this.$t("replaceRule.confirmImportCount", {
+          count: ruleList.length
+        }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -238,13 +263,15 @@ export default {
       Axios.post(this.api + "/saveReplaceRules", ruleList).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("导入替换规则成功");
+            this.$message.success(this.$t("replaceRule.importSuccess"));
             this.$root.$children[0].loadReplaceRules(true);
           }
         },
         error => {
           this.$message.error(
-            "导入替换规则失败 " + (error && error.toString())
+            this.$t("replaceRule.importFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );

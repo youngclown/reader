@@ -1,15 +1,22 @@
-import Vue from "vue";
+﻿import Vue from "vue";
 import Vuex from "vuex";
-import settings, { customFonts, syncConfigFiled } from "./config";
+import settings, {
+  customFonts,
+  normalizeConfigValues,
+  normalizeCustomConfigList,
+  syncConfigFiled
+} from "./config";
 import { setCache, getCache } from "../plugins/cache";
 import { Message } from "element-ui";
+import { setLocale } from "./i18n";
+import { t } from "./i18n";
 
-const defaultNS = [{ username: "默认", userNS: "default" }];
+const defaultNS = [{ username: t("user.systemDefault"), userNS: "default" }];
 const builtInBookGroup = [
-  { groupId: -1, groupName: "全部", order: -10, show: true },
-  { groupId: -2, groupName: "本地", order: -9, show: true },
-  { groupId: -3, groupName: "音频", order: -8, show: true },
-  { groupId: -4, groupName: "未分组", order: -7, show: true }
+  { groupId: -1, groupNameKey: "group.allBooks", order: -10, show: true },
+  { groupId: -2, groupNameKey: "book.local", order: -9, show: true },
+  { groupId: -3, groupNameKey: "group.audio", order: -8, show: true },
+  { groupId: -4, groupNameKey: "book.ungrouped", order: -7, show: true }
 ];
 Vue.use(Vuex);
 
@@ -63,14 +70,13 @@ export default new Vuex.Store({
     previewImgList: [],
     searchConfig: { ...settings.searchConfig },
     txtTocRules: [],
-    customConfigList: [].concat(settings.customConfigList),
+    customConfigList: normalizeCustomConfigList(settings.customConfigList),
     showBookInfo: {},
     cachingBookList: [],
     bookmarks: []
   },
   mutations: {
     setShelfBooks(state, books) {
-      // 过滤一下不用的字段，省点内存
       window.shelfBooks = books;
       state.shelfBooks = books.map(v => {
         return {
@@ -144,7 +150,6 @@ export default new Vuex.Store({
     },
     setReadingBook(state, readingBook) {
       state.readingBook = readingBook;
-      // 更新书架信息
       setTimeout(() => {
         for (let i = 0; i < state.shelfBooks.length; i++) {
           if (state.shelfBooks[i].bookUrl === readingBook.bookUrl) {
@@ -173,6 +178,7 @@ export default new Vuex.Store({
       );
     },
     setConfig(state, config) {
+      config = normalizeConfigValues(config);
       delete config.name;
       delete config.configDefaultType;
       if (
@@ -184,7 +190,9 @@ export default new Vuex.Store({
         config.themeType = "night";
       }
       state.config = config;
-      // 同步设置到 customConfig
+      if (config.locale) {
+        setLocale(config.locale);
+      }
       if (config.customConfig) {
         const index = state.customConfigList.findIndex(
           v => v.name === config.customConfig
@@ -208,7 +216,7 @@ export default new Vuex.Store({
       setCache("config", JSON.stringify(config));
     },
     setMiniInterface(state, mini) {
-      if (state.config.pageMode === "自适应") {
+      if (state.config.pageMode === "adaptive") {
         state.miniInterface = mini;
       } else {
         state.miniInterface = true;
@@ -240,7 +248,6 @@ export default new Vuex.Store({
       setCache("api_token", token);
     },
     setBookSourceList(state, list) {
-      // 过滤一下不用的字段，省点内存
       state.bookSourceList = list.map(v => {
         return {
           bookSourceGroup: v.bookSourceGroup,
@@ -272,7 +279,7 @@ export default new Vuex.Store({
     setUserList(state, userList) {
       if (userList.length) {
         state.userList = []
-          .concat([{ username: "系统默认", userNS: "default" }])
+          .concat([{ username: t("user.systemDefault"), userNS: "default" }])
           .concat(userList);
       } else {
         state.userList = [].concat(defaultNS);
@@ -297,18 +304,24 @@ export default new Vuex.Store({
       let config = { ...state.config };
       let themeConfig;
       if (isNight) {
-        // 设置为默认黑夜方案
         themeConfig = state.customConfigList.find(
-          v => v.configDefaultType === "黑夜默认"
+          v => v.configDefaultType === "nightDefault"
         );
       } else {
-        // 设置为默认白天方案
         themeConfig = state.customConfigList.find(
-          v => v.configDefaultType === "白天默认"
+          v => v.configDefaultType === "dayDefault"
         );
       }
       if (!themeConfig) {
-        Message.error("未配置" + (isNight ? "黑夜默认" : "白天默认") + "方案");
+        Message.error(
+          t("readSettings.defaultSchemeMissing", {
+            type: t(
+              isNight
+                ? "readSettings.option.nightDefault"
+                : "readSettings.option.dayDefault"
+            )
+          })
+        );
         return;
       }
       config = { ...config, ...themeConfig };
@@ -386,7 +399,10 @@ export default new Vuex.Store({
 
       builtInBookGroup.forEach(group => {
         if (!bookGroupList.some(v => v.groupId === group.groupId)) {
-          _bookGroupList.push(group);
+          _bookGroupList.push({
+            ...group,
+            groupName: t(group.groupNameKey)
+          });
         }
       });
       state.bookGroupList = _bookGroupList
@@ -421,8 +437,8 @@ export default new Vuex.Store({
       state.txtTocRules = [].concat(tocRules);
     },
     setCustomConfigList(state, customConfigList) {
-      state.customConfigList = [].concat(customConfigList);
-      setCache("customConfigList", JSON.stringify(customConfigList));
+      state.customConfigList = normalizeCustomConfigList(customConfigList);
+      setCache("customConfigList", JSON.stringify(state.customConfigList));
     },
     setShowBookInfo(state, book) {
       state.showBookInfo = book;
@@ -449,7 +465,7 @@ export default new Vuex.Store({
       return getters.api.replace(/\/reader3\/?/, "");
     },
     isSlideRead: state => {
-      return state.miniInterface && state.config.readMethod === "左右滑动";
+      return state.miniInterface && state.config.readMethod === "horizontalSwipe";
     },
     isSystemNight: state => {
       return state.config.theme === settings.defaultNightTheme;
@@ -461,7 +477,7 @@ export default new Vuex.Store({
       return state.config.pageType === "Kindle";
     },
     isNormalPage: state => {
-      return state.config.pageType === "正常";
+      return state.config.pageType === "normal";
     },
     currentContentBGImg: (state, getters) => {
       if (state.config.contentBGImg) {
@@ -564,7 +580,7 @@ export default new Vuex.Store({
       });
       const groups = [
         {
-          name: "全部分组",
+          name: t("group.all"),
           value: "",
           count: state.bookSourceList.length
         }
@@ -582,7 +598,7 @@ export default new Vuex.Store({
     },
     builtInBookGroupMap: () => {
       return builtInBookGroup.reduce((c, v) => {
-        c[v.groupId] = v.groupName;
+        c[v.groupId] = t(v.groupNameKey);
         return c;
       }, {});
     },
@@ -636,7 +652,6 @@ export default new Vuex.Store({
   actions: {
     syncFromLocalStorage({ commit, getters }) {
       try {
-        // 获取配置
         const config = getCache("config");
         if (config && typeof config === "object") {
           commit("setConfig", { ...settings.config, ...config });
@@ -645,7 +660,6 @@ export default new Vuex.Store({
         //
       }
       try {
-        // 获取最近阅读书籍
         const readingRecent = getCache(
           getters.currentUserName + "@readingRecent"
         );
@@ -659,7 +673,6 @@ export default new Vuex.Store({
         //
       }
       // try {
-      //   // 获取过滤规则
       //   const filterRules = getCache("filterRules");
       //   if (filterRules && Array.isArray(filterRules)) {
       //     commit("setFilterRules", filterRules);
@@ -668,7 +681,6 @@ export default new Vuex.Store({
       //   //
       // }
       try {
-        // 获取自定义配置方案
         const customConfigList = getCache("customConfigList");
         if (customConfigList && Array.isArray(customConfigList)) {
           commit("setCustomConfigList", customConfigList);
@@ -677,7 +689,6 @@ export default new Vuex.Store({
         //
       }
       try {
-        // 获取听书配置
         const speechVoiceConfig = getCache("speechVoiceConfig");
         if (speechVoiceConfig && typeof speechVoiceConfig === "object") {
           commit("setSpeechVoiceConfig", {
@@ -689,7 +700,6 @@ export default new Vuex.Store({
         //
       }
       try {
-        // 获取书架设置
         const shelfConfig = getCache("shelfConfig");
         if (shelfConfig && typeof shelfConfig === "object") {
           commit("setShelfConfig", {
@@ -701,7 +711,6 @@ export default new Vuex.Store({
         //
       }
       try {
-        // 获取搜索设置
         const searchConfig = getCache("searchConfig");
         if (searchConfig && typeof searchConfig === "object") {
           commit("setSearchConfig", {

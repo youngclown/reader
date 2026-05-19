@@ -10,16 +10,20 @@
   >
     <div class="custom-dialog-title" slot="title">
       <span class="el-dialog__title"
-        >RSS订阅({{ rssSourceList.length }})
+        >{{ $t("rss.subscription") }}({{ rssSourceList.length }})
         <span
           class="float-right span-btn"
           @click="showRssSourceEditButton = !showRssSourceEditButton"
-          >{{ showRssSourceEditButton ? "取消" : "编辑" }}</span
+          >{{
+            showRssSourceEditButton ? $t("common.cancel") : $t("common.edit")
+          }}</span
         >
-        <span class="float-right span-btn" @click="uploadRssSource">导入</span>
-        <span class="float-right span-btn" @click="editRssSource(false)"
-          >新增</span
-        >
+        <span class="float-right span-btn" @click="uploadRssSource">{{
+          $t("common.import")
+        }}</span>
+        <span class="float-right span-btn" @click="editRssSource(false)">{{
+          $t("common.add")
+        }}</span>
       </span>
       <input
         ref="rssInputRef"
@@ -94,11 +98,15 @@ export default {
       this.$emit("setShow", false);
     },
     async deleteRssSource(source) {
-      const res = await this.$confirm(`确认要删除该RSS订阅源吗?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("rss.confirmDeleteSource"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -107,12 +115,16 @@ export default {
       Axios.post(this.api + "/deleteRssSource", source).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("删除成功");
+            this.$message.success(this.$t("common.deleteSuccess"));
             this.loadRssSources(true);
           }
         },
         error => {
-          this.$message.error("删除失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.deleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -127,7 +139,7 @@ export default {
     },
     editRssSource(rssSource) {
       rssSource = rssSource || {
-        sourceName: "新增RSS源",
+        sourceName: this.$t("rss.addSource"),
         sourceUrl: "",
         sourceIcon: "",
         sourceGroup: "",
@@ -144,17 +156,17 @@ export default {
       };
       eventBus.$emit(
         "showEditor",
-        "编辑RSS源",
+        this.$t("rss.editSource"),
         JSON.stringify(rssSource, null, 4),
         (content, close) => {
           try {
             const source = JSON.parse(content);
             if (!source.sourceName) {
-              this.$message.error("RSS源名称不能为空");
+              this.$message.error(this.$t("rss.sourceNameRequired"));
               return;
             }
             if (!source.sourceUrl) {
-              this.$message.error("RSS源链接不能为空");
+              this.$message.error(this.$t("rss.sourceUrlRequired"));
               return;
             }
             Axios.post(this.api + "/saveRssSource", source).then(
@@ -162,18 +174,20 @@ export default {
                 if (res.data.isSuccess) {
                   //
                   close();
-                  this.$message.success("保存RSS源成功");
+                  this.$message.success(this.$t("rss.saveSourceSuccess"));
                   this.loadRssSources(true);
                 }
               },
               error => {
                 this.$message.error(
-                  "保存RSS源失败 " + (error && error.toString())
+                  this.$t("rss.saveSourceFailed", {
+                    message: error && error.toString()
+                  })
                 );
               }
             );
           } catch (e) {
-            this.$message.error("RSS源必须是JSON格式");
+            this.$message.error(this.$t("rss.sourceJsonRequired"));
           }
         }
       );

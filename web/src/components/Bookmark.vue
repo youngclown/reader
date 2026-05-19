@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-dialog
     :visible.sync="show"
     :width="dialogWidth"
@@ -12,8 +12,10 @@
   >
     <div class="custom-dialog-title" slot="title">
       <span class="el-dialog__title"
-        >{{ this.book ? this.book.name : "" }} 书签管理
-        <span class="float-right span-btn" @click="uploadFile">导入</span>
+        >{{ this.book ? this.book.name : "" }} {{ $t("bookmark.manage") }}
+        <span class="float-right span-btn" @click="uploadFile">{{
+          $t("common.import")
+        }}</span>
         <input
           ref="fileRef"
           type="file"
@@ -36,27 +38,39 @@
         </el-table-column>
         <el-table-column
           min-width="150px"
-          label="书籍"
+          :label="$t('book.title')"
           :fixed="$store.state.miniInterface"
         >
           <template slot-scope="scope">
             {{ scope.row.bookName }} - {{ scope.row.bookAuthor }}
           </template>
         </el-table-column>
-        <el-table-column property="chapterName" label="章节" min-width="150px">
+        <el-table-column
+          property="chapterName"
+          :label="$t('book.chapter')"
+          min-width="150px"
+        >
         </el-table-column>
-        <el-table-column property="bookText" label="内容" min-width="150px">
+        <el-table-column
+          property="bookText"
+          :label="$t('bookmark.content')"
+          min-width="150px"
+        >
         </el-table-column>
-        <el-table-column property="content" label="备注" min-width="150px">
+        <el-table-column
+          property="content"
+          :label="$t('bookmark.note')"
+          min-width="150px"
+        >
         </el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
-            <el-button type="text" @click="showBookmark(scope.row)"
-              >跳转</el-button
-            >
-            <el-button type="text" @click="editBookmark(scope.row)"
-              >编辑</el-button
-            >
+            <el-button type="text" @click="showBookmark(scope.row)">{{
+              $t("bookmark.jump")
+            }}</el-button>
+            <el-button type="text" @click="editBookmark(scope.row)">{{
+              $t("common.edit")
+            }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -67,10 +81,14 @@
         size="medium"
         class="float-left"
         @click="deleteBookmarks"
-        >批量删除</el-button
+        >{{ $t("book.batchDelete") }}</el-button
       >
-      <span class="check-tip">已选择 {{ localSelection.length }} 个</span>
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <span class="check-tip">{{
+        $t("common.selectedCount", { count: localSelection.length })
+      }}</span>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -122,14 +140,18 @@ export default {
     },
     async deleteBookmarks() {
       if (!this.localSelection.length) {
-        this.$message.error("请选择需要删除的书签");
+        this.$message.error(this.$t("bookmark.selectDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的书签吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("bookmark.confirmDeleteSelected"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -139,12 +161,16 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.localSelection = [];
-            this.$message.success("删除书签成功");
+            this.$message.success(this.$t("bookmark.deleteSuccess"));
             this.$root.$children[0].loadBookmarks(true);
           }
         },
         error => {
-          this.$message.error("删除书签失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("bookmark.deleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -166,12 +192,11 @@ export default {
             this.comfirmImport(bookmarkList);
           }
         } catch (error) {
-          this.$message.error("书签文件错误");
+          this.$message.error(this.$t("bookmark.fileError"));
         }
       };
       reader.onerror = () => {
         // console.log("FileReader error", e);
-        // FileReader 读取出错，只能上传读取了
         let param = new FormData();
         param.append("file", rawFile);
         Axios.post(this.api + "/readSourceFile", param, {
@@ -194,13 +219,15 @@ export default {
               if (bookmarkList.length) {
                 this.comfirmImport(bookmarkList);
               } else {
-                this.$message.error("书签文件错误");
+                this.$message.error(this.$t("bookmark.fileError"));
               }
             }
           },
           error => {
             this.$message.error(
-              "读取书签文件内容失败 " + (error && error.toString())
+              this.$t("bookmark.fileReadFailed", {
+                message: error && error.toString()
+              })
             );
           }
         );
@@ -210,11 +237,13 @@ export default {
     },
     async comfirmImport(bookmarkList) {
       const res = await this.$confirm(
-        `确认要导入文件中的${bookmarkList.length}条书签吗?`,
-        "提示",
+        this.$t("bookmark.confirmImportCount", {
+          count: bookmarkList.length
+        }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -226,12 +255,16 @@ export default {
       Axios.post(this.api + "/saveBookmarks", bookmarkList).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("导入书签成功");
+            this.$message.success(this.$t("bookmark.importSuccess"));
             this.$root.$children[0].loadBookmarks(true);
           }
         },
         error => {
-          this.$message.error("导入书签失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("bookmark.importFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },

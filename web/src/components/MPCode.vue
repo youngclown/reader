@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="关注公众号【假装大佬】"
+    :title="$t('home.followOfficialAccount')"
     :visible.sync="show"
     :width="dialogSmallWidth"
     :top="dialogTop"

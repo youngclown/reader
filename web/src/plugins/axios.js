@@ -1,7 +1,8 @@
-import Axios from "axios";
+﻿import Axios from "axios";
 import { Message, MessageBox } from "element-ui";
 import { errorTypeList } from "./config";
 import store from "./vuex";
+import { t } from "./i18n";
 
 const service = Axios.create({
   baseURL: store.getters.api,
@@ -44,7 +45,6 @@ export const request = async ({
   options = {},
   alert
 }) => {
-  // post 默认显示返回的信息
   if (alert === undefined) {
     alert = method === "post";
   }
@@ -55,7 +55,6 @@ export const request = async ({
     params.secureKey = store.state.secureKey;
     params.userNS = store.state.userNS;
   }
-  // 防止 ie 缓存 GET 请求
   params.v = new Date().getTime();
   const query = {
     url,
@@ -67,7 +66,6 @@ export const request = async ({
   };
   const response = await service(query).catch(e => {
     if (params.bookSourceUrl && store.state.failureIncludeTimeout) {
-      // 判断是否失效书源
       const errorMsg = e.toString();
       window.errorMsgList = window.errorMsgList || [];
       window.errorMsgList.push(errorMsg);
@@ -90,7 +88,6 @@ export const request = async ({
     let result;
     switch (res.data) {
       case "NEED_LOGIN":
-        // 需要登录
         store.commit("setShowLogin", true);
         if (!isShowLoginTip) {
           isShowLoginTip = true;
@@ -104,8 +101,8 @@ export const request = async ({
         break;
       case "NEED_SECURE_KEY":
         result = await MessageBox.prompt(
-          "请输入管理密码后继续操作",
-          "操作确认"
+          t("auth.secureKeyPrompt"),
+          t("common.confirmOperation")
         );
         if (result && result.action === "confirm" && result.value) {
           params.secureKey = result.value;
@@ -122,7 +119,6 @@ export const request = async ({
         break;
       default:
         if (params.bookSourceUrl) {
-          // 判断是否失效书源
           if (errorMsg) {
             window.errorMsgList = window.errorMsgList || [];
             window.errorMsgList.push(errorMsg);

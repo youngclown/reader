@@ -1,7 +1,8 @@
-import Vue from "vue";
+﻿import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import "./plugins/element.js";
+import "./plugins/i18n.js";
 import store from "./plugins/vuex.js";
 import "./plugins/md5.js";
 import { registerServiceWorker } from "./registerServiceWorker";
@@ -12,7 +13,6 @@ import { jsonEncode } from "./plugins/safe-json-stringify";
 import localforage from "localforage";
 
 try {
-  // 设置全局错误收集
   if (window.location.href.indexOf("errorAlert") > 0) {
     window.errorAlert = true;
   }
@@ -88,7 +88,6 @@ try {
           return this.api + "/cover?path=" + url;
         }
         if (!url) return false;
-        // 默认是接口服务器上的资源
         return this.$store.getters.apiRoot + url;
       },
       getCover(coverUrl, normal, useSW) {

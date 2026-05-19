@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="书籍信息"
+    :title="$t('book.info')"
     :visible.sync="show"
     :width="dialogSmallWidth"
     :fullscreen="$store.state.miniInterface"
@@ -32,24 +32,25 @@
       <div class="book-kind" v-html="renderBookKind(showBookInfo.kind)"></div>
       <div class="book-props">
         <div class="book-prop book-author">
-          作者： {{ showBookInfo.author || "未知" }}
+          {{ $t("book.author") }}:
+          {{ showBookInfo.author || $t("common.unknown") }}
         </div>
         <div class="book-prop book-origin">
-          来源： {{ displayOriginName(showBookInfo.origin) }}
+          {{ $t("book.origin") }}: {{ displayOriginName(showBookInfo.origin) }}
           <el-button
             type="text"
             class="book-prop-btn"
             v-if="showBookInfo.origin === 'loc_book'"
             @click="refreshLocalBook(showBookInfo)"
-            >更新</el-button
+            >{{ $t("common.update") }}</el-button
           >
         </div>
         <div class="book-prop book-latest">
           <span class="latest-title"
-            >最新： {{ showBookInfo.latestChapterTitle }}
+            >{{ $t("book.latest") }}: {{ showBookInfo.latestChapterTitle }}
           </span>
           <span class="book-prop-btn" v-if="isInShelf">
-            追更
+            {{ $t("book.followUpdate") }}
             <el-switch
               v-model="showBookInfo.canUpdate"
               active-color="#13ce66"
@@ -62,12 +63,12 @@
           </span>
         </div>
         <div class="book-prop book-group" v-if="isInShelf">
-          分组： {{ displayGroupName(showBookInfo.group) }}
+          {{ $t("book.group") }}: {{ displayGroupName(showBookInfo.group) }}
           <el-button
             type="text"
             class="book-prop-btn"
             @click="showSetBookGroup()"
-            >设置分组</el-button
+            >{{ $t("book.setGroup") }}</el-button
           >
         </div>
         <div class="book-prop book-operate-zone" v-else>
@@ -77,7 +78,7 @@
             class="book-operate-btn"
             @click.stop="saveBook(showBookInfo, true)"
           >
-            加入书架
+            {{ $t("book.addToShelf") }}
           </el-tag>
         </div>
       </div>
@@ -149,13 +150,13 @@ export default {
           unGroupName = v.groupName;
         }
       });
-      return groupName.join(",") || unGroupName || "未分组";
+      return groupName.join(",") || unGroupName || this.$t("book.ungrouped");
     },
     displayOriginName(value) {
-      if (value === "loc_book") return "本地";
+      if (value === "loc_book") return this.$t("book.local");
       return (
         (this.bookSourceList.find(v => v.bookSourceUrl === value) || {})
-          .bookSourceName || "未知书源"
+          .bookSourceName || this.$t("book.unknownSource")
       );
     },
     renderBookKind(value) {
@@ -171,7 +172,7 @@ export default {
         .join("");
     },
     renderBookIntro(book) {
-      const intro = (book.intro || "暂无简介").split("\n");
+      const intro = (book.intro || this.$t("book.noIntro")).split("\n");
       return intro
         .map(v => {
           return `<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${v.replace(
@@ -202,7 +203,7 @@ export default {
         res => {
           if (res.data.isSuccess) {
             if (!res.data.data.length) {
-              this.$message.error("上传文件失败");
+              this.$message.error(this.$t("common.uploadFileFailed"));
               return;
             }
             this.showBookInfo.customCoverUrl = res.data.data[0];
@@ -212,7 +213,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("上传文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.uploadFileFailedWithMessage", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -222,13 +227,15 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("更新成功");
+            this.$message.success(this.$t("book.updateSuccess"));
             this.showBookInfo = res.data.data;
             this.$store.commit("updateShelfBook", res.data.data);
           }
         },
         error => {
-          this.$message.error("更新失败" + (error && error.toString()));
+          this.$message.error(
+            this.$t("book.updateFailed", { message: error && error.toString() })
+          );
         }
       );
     },
@@ -239,7 +246,11 @@ export default {
       return Axios.post(this.api + "/saveBook", book).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success(isAdd ? "加入书架成功" : "操作成功");
+            this.$message.success(
+              isAdd
+                ? this.$t("book.addToShelfSuccess")
+                : this.$t("common.operationSuccess")
+            );
             this.showBookInfo = res.data.data;
             if (isAdd) {
               this.$root.$children[0].loadBookShelf(true);
@@ -250,7 +261,13 @@ export default {
         },
         error => {
           this.$message.error(
-            (isAdd ? "加入书架失败" : "操作失败") + (error && error.toString())
+            isAdd
+              ? this.$t("book.addToShelfFailed", {
+                  message: error && error.toString()
+                })
+              : this.$t("common.operationFailed", {
+                  message: error && error.toString()
+                })
           );
         }
       );

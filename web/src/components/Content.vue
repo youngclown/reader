@@ -1,4 +1,4 @@
-<script>
+﻿<script>
 import { loadFont } from "../plugins/helper";
 export default {
   name: "Content",
@@ -41,7 +41,6 @@ export default {
         );
       }
       if (this.isAudio) {
-        // 音频
         return this.renderAudio();
       } else if (this.isEpub) {
         // epub
@@ -50,7 +49,7 @@ export default {
       if (this.isScrollRead) {
         return this.renderScrollChapterList();
       }
-      let wordCount = this.title.length + 2; // 2为两个换行符
+      let wordCount = this.title.length + 2;
       return (
         <div
           class="content-body chapter-content reading-chapter"
@@ -66,10 +65,8 @@ export default {
               return null;
             }
             const pos = wordCount;
-            wordCount += a.length + 2; // 2为两个换行符
+            wordCount += a.length + 2;
             if (a.indexOf("<img") >= 0) {
-              // 漫画
-              // 将 src 替换为 data-src 懒加载
               a = a
                 .replace(/src=/g, "data-src=")
                 .replace("__API_ROOT__", this.$store.getters.apiRoot);
@@ -81,7 +78,6 @@ export default {
                 ></div>
               );
             }
-            // 文本内容
             return (
               <p style={this.pStyle} domPropsInnerHTML={a} data-pos={pos} />
             );
@@ -216,7 +212,7 @@ export default {
                 </div>
               );
             }
-            let wordCount = chapter.title.length + 2; // 2为两个换行符
+            let wordCount = chapter.title.length + 2;
             return (
               <div
                 class={[
@@ -234,10 +230,8 @@ export default {
                     return null;
                   }
                   const pos = wordCount;
-                  wordCount += a.length + 2; // 2为两个换行符
+                  wordCount += a.length + 2;
                   if (a.indexOf("<img") >= 0) {
-                    // 漫画
-                    // 将 src 替换为 data-src 懒加载
                     a = a
                       .replace(/src=/g, "data-src=")
                       .replace("__API_ROOT__", this.$store.getters.apiRoot);
@@ -249,7 +243,6 @@ export default {
                       ></div>
                     );
                   }
-                  // 文本内容
                   return (
                     <p
                       style={this.pStyle}
@@ -418,9 +411,7 @@ export default {
           }
           if (message.event === "inited") {
             this.iframeStyle = {};
-            // 设置iframe样式
             this.setIframeStyle();
-            // 同步iframe高度
             this.syncIframeHeight();
           } else if (message.event === "load") {
             setTimeout(() => {
@@ -611,7 +602,6 @@ export default {
         this.audioDuration = parseInt(duration);
         this.$refs.audio.playbackRate = this.currentSpeed;
         this.$refs.audio.currentTime = this.startTime;
-        // 有时会失败（看浏览器）
         if (this.autoPlay) {
           this.$refs.audio.play();
         }
@@ -622,7 +612,6 @@ export default {
       }
     },
     onProgress() {
-      // 记录缓存进度。触发事件包括缓存数据更新时的 progress 事件，以及各种播放动作会触发的 playing 事件
     },
     onTimeupdate() {
       if (this.$refs.audio) {

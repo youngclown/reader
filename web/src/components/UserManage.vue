@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="用户管理"
+    :title="$t('user.manage')"
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -13,10 +13,10 @@
   >
     <div class="custom-dialog-title" slot="title">
       <span class="el-dialog__title"
-        >用户管理
-        <span class="float-right span-btn" @click="showAddUserDialog()"
-          >新增</span
-        >
+        >{{ $t("user.manage") }}
+        <span class="float-right span-btn" @click="showAddUserDialog()">{{
+          $t("user.add")
+        }}</span>
       </span>
     </div>
     <div class="source-container table-container">
@@ -34,19 +34,19 @@
         </el-table-column>
         <el-table-column
           property="username"
-          label="用户名"
+          :label="$t('common.username')"
           min-width="100"
           :fixed="$store.state.miniInterface"
         ></el-table-column>
         <el-table-column
           property="lastLoginAt"
-          label="上次登录"
+          :label="$t('user.lastLogin')"
           :formatter="formatTableField"
           min-width="120"
         ></el-table-column>
         <el-table-column
           property="createdAt"
-          label="注册时间"
+          :label="$t('user.createdAt')"
           :formatter="formatTableField"
           min-width="120"
         ></el-table-column>
@@ -66,7 +66,7 @@
         </el-table-column>
         <el-table-column
           property="enableLocalStore"
-          label="书仓"
+          :label="$t('user.localStore')"
           min-width="80"
         >
           <template slot-scope="scope">
@@ -82,13 +82,15 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
-            <el-button type="text" @click="resetPassword(scope.row)"
-              >重置密码</el-button
-            >
-            <el-button type="text" @click="setAsDefaultBookSources(scope.row)"
-              >设为默认书源</el-button
+            <el-button type="text" @click="resetPassword(scope.row)">{{
+              $t("user.resetPassword")
+            }}</el-button>
+            <el-button
+              type="text"
+              @click="setAsDefaultBookSources(scope.row)"
+              >{{ $t("user.setDefaultBookSource") }}</el-button
             >
           </template>
         </el-table-column>
@@ -100,17 +102,21 @@
         size="medium"
         class="float-left"
         @click="deleteUserList"
-        >批量删除</el-button
+        >{{ $t("book.batchDelete") }}</el-button
       >
       <el-button
         type="primary"
         size="medium"
         class="float-left"
         @click="deleteUserBookSource"
-        >删除用户书源</el-button
+        >{{ $t("user.deleteUserSource") }}</el-button
       >
-      <span class="check-tip">已选择 {{ manageUserSelection.length }} 个</span>
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <span class="check-tip">{{
+        $t("book.selectedCount", { count: manageUserSelection.length })
+      }}</span>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -175,14 +181,18 @@ export default {
     },
     async deleteUserList() {
       if (!this.manageUserSelection.length) {
-        this.$message.error("请选择需要删除的用户");
+        this.$message.error(this.$t("user.selectDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的用户吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("user.confirmDeleteSelected"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -195,7 +205,7 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.manageUserSelection = [];
-            this.$message.success("删除用户成功");
+            this.$message.success(this.$t("user.deleteSuccess"));
             this.userList = res.data.data.map(v => ({
               ...v,
               userNS: v.username
@@ -203,20 +213,28 @@ export default {
           }
         },
         error => {
-          this.$message.error("删除用户失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("user.deleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async deleteUserBookSource() {
       if (!this.manageUserSelection.length) {
-        this.$message.error("请选择需要删除书源的用户");
+        this.$message.error(this.$t("user.selectDeleteSourceRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的用户书源吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("user.confirmDeleteSelectedSources"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -229,11 +247,15 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.manageUserSelection = [];
-            this.$message.success("操作成功");
+            this.$message.success(this.$t("common.operationSuccess"));
           }
         },
         error => {
-          this.$message.error("操作失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.operationFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -244,7 +266,7 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("修改成功");
+            this.$message.success(this.$t("common.editSuccess"));
             this.userList = res.data.data.map(v => ({
               ...v,
               userNS: v.username
@@ -252,7 +274,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("修改失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.editFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -263,7 +289,7 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("修改成功");
+            this.$message.success(this.$t("common.editSuccess"));
             this.userList = res.data.data.map(v => ({
               ...v,
               userNS: v.username
@@ -271,17 +297,23 @@ export default {
           }
         },
         error => {
-          this.$message.error("修改失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.editFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async setAsDefaultBookSources(user) {
       const res = await this.$confirm(
-        `确认要将用户${user.username}的书源设为默认书源（新用户有效）吗?`,
-        "提示",
+        this.$t("user.confirmSetDefaultBookSource", {
+          username: user.username
+        }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -295,22 +327,26 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("设置成功");
+            this.$message.success(this.$t("common.setSuccess"));
           }
         },
         error => {
-          this.$message.error("设置失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.setFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async resetPassword(user) {
-      const res = await this.$prompt("", "重置密码", {
+      const res = await this.$prompt("", this.$t("user.resetPassword"), {
         inputValue: "",
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        inputValidator(v) {
+        confirmButtonText: this.$t("common.confirm"),
+        cancelButtonText: this.$t("common.cancel"),
+        inputValidator: v => {
           if (!v) {
-            return "密码不能为空";
+            return this.$t("auth.passwordRequired");
           }
           return true;
         }
@@ -326,11 +362,15 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("重置密码成功");
+            this.$message.success(this.$t("user.resetPasswordSuccess"));
           }
         },
         error => {
-          this.$message.error("重置密码失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("user.resetPasswordFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     }

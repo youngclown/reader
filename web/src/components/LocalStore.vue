@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="书仓文件管理"
+    :title="$t('file.localStoreManage')"
     :visible.sync="show"
     :width="dialogWidth"
     :top="dialogTop"
@@ -27,7 +27,7 @@
         <el-table-column
           property="name"
           min-width="150px"
-          label="文件名"
+          :label="$t('file.name')"
           :fixed="$store.state.miniInterface"
         >
           <template slot-scope="scope">
@@ -42,30 +42,30 @@
         </el-table-column>
         <el-table-column
           property="size"
-          label="大小"
+          :label="$t('file.size')"
           :formatter="formatTableField"
           min-width="100px"
         ></el-table-column>
         <el-table-column
           property="lastModified"
-          label="修改时间"
+          :label="$t('file.modifiedAt')"
           :formatter="formatTableField"
           width="120px"
         ></el-table-column>
-        <el-table-column label="操作" width="100px">
+        <el-table-column :label="$t('group.operation')" width="100px">
           <template slot-scope="scope">
             <el-button
               type="text"
               @click="deleteLocalStoreFile(scope.row)"
               style="color: #f56c6c"
               v-if="!scope.row.toParent"
-              >删除</el-button
+              >{{ $t("common.delete") }}</el-button
             >
             <el-button
               type="text"
               @click="importFromLocalStore(scope.row)"
               v-if="canImport(scope.row)"
-              >加入书架</el-button
+              >{{ $t("book.addToShelf") }}</el-button
             >
           </template>
         </el-table-column>
@@ -77,14 +77,14 @@
         size="medium"
         class="float-left"
         @click="deleteLocalStoreFileList"
-        >批量删除</el-button
+        >{{ $t("book.batchDelete") }}</el-button
       >
       <el-button
         type="primary"
         size="medium"
         class="float-left"
         @click="importFromLocalStore(true)"
-        >批量加入书架</el-button
+        >{{ $t("file.batchAddToShelf") }}</el-button
       >
       <el-button
         type="primary"
@@ -92,7 +92,7 @@
         class="float-left"
         @click="uploadToLocalStore"
       >
-        上传书籍
+        {{ $t("file.uploadBooks") }}
       </el-button>
       <input
         ref="bookRef"
@@ -101,8 +101,12 @@
         @change="onBookFileChange"
         style="display:none"
       />
-      <span class="check-tip">已选择 {{ localFileSelection.length }} 个</span>
-      <el-button size="medium" @click="cancel">取消</el-button>
+      <span class="check-tip">{{
+        $t("common.selectedCount", { count: localFileSelection.length })
+      }}</span>
+      <el-button size="medium" @click="cancel">{{
+        $t("common.cancel")
+      }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -188,21 +192,27 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载书仓文件列表失败 " + (error && error.toString())
+            this.$t("file.localStoreLoadFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
     },
     async deleteLocalStoreFileList() {
       if (!this.localFileSelection.length) {
-        this.$message.error("请选择需要删除的文件");
+        this.$message.error(this.$t("file.selectDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的文件吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("file.confirmDeleteSelected"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -214,22 +224,28 @@ export default {
         res => {
           if (res.data.isSuccess) {
             this.localFileSelection = [];
-            this.$message.success("删除文件成功");
+            this.$message.success(this.$t("common.fileDeleteSuccess"));
             this.showLocalStoreFile(this.localCurrentPath);
           }
         },
         error => {
-          this.$message.error("删除文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.fileDeleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async deleteLocalStoreFile(row) {
       const res = await this.$confirm(
-        `确认要删除该${row.isDirectory ? "文件夹" : "文件"}吗?`,
-        "提示",
+        this.$t("file.confirmDeleteOne", {
+          type: row.isDirectory ? this.$t("file.folder") : this.$t("file.file")
+        }),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -243,19 +259,23 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("删除文件成功");
+            this.$message.success(this.$t("common.fileDeleteSuccess"));
             this.showLocalStoreFile(this.localCurrentPath);
           }
         },
         error => {
-          this.$message.error("删除文件失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.fileDeleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async importFromLocalStore(row) {
       if (row === true) {
         if (!this.localFileSelection.length) {
-          this.$message.error("请选择需要加入书架的书籍");
+          this.$message.error(this.$t("file.selectAddToShelfRequired"));
           return;
         }
       }
@@ -266,7 +286,7 @@ export default {
         res => {
           if (res.data.isSuccess) {
             if (!res.data.data || !res.data.data.length) {
-              this.$message.error("没有选择可导入的书籍");
+              this.$message.error(this.$t("file.noImportableBooks"));
               return;
             }
             // this.cancel();
@@ -276,7 +296,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("请求失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.requestFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -298,12 +322,16 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("上传书籍成功");
+            this.$message.success(this.$t("file.uploadBooksSuccess"));
             this.showLocalStoreFile(this.localCurrentPath);
           }
         },
         error => {
-          this.$message.error("上传书籍 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("file.uploadBooksFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
       this.$refs.bookRef.value = null;

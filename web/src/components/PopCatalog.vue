@@ -2,30 +2,32 @@
   <div class="popup-wrapper" :style="popupTheme">
     <div class="title-zone">
       <div class="title">
-        目录
+        {{ $t("reader.catalog") }}
         <span v-if="catalog.length">({{ catalog.length }})</span>
       </div>
       <div :class="{ 'title-btn': true }">
         <span class="span-btn" v-if="catalog.length" @click="asc = !asc">{{
-          asc ? "倒序" : "顺序"
+          asc ? $t("catalog.desc") : $t("catalog.asc")
         }}</span>
-        <span class="span-btn" v-if="catalog.length" @click="toTop">顶部</span>
-        <span class="span-btn" v-if="catalog.length" @click="toBottom"
-          >底部</span
-        >
+        <span class="span-btn" v-if="catalog.length" @click="toTop">{{
+          $t("reader.top")
+        }}</span>
+        <span class="span-btn" v-if="catalog.length" @click="toBottom">{{
+          $t("reader.bottom")
+        }}</span>
         <span
           class="span-btn"
           v-if="book.origin === 'loc_book'"
           @click="changeRule"
         >
-          修改规则
+          {{ $t("catalog.modifyRule") }}
         </span>
         <span
           :class="{ loading: refreshLoading, 'refresh-btn': true }"
           @click="refreshChapter"
         >
           <i class="el-icon-loading" v-if="refreshLoading"></i>
-          {{ refreshLoading ? "刷新中..." : "刷新" }}
+          {{ refreshLoading ? $t("common.refreshing") : $t("common.refresh") }}
         </span>
       </div>
     </div>
@@ -108,12 +110,18 @@ export default {
       } else {
         // epub
         return [
-          { name: "根据 Spin 获取章节，使用 Toc 补充章节名", rule: "spin+toc" },
-          { name: "根据 Spin 获取章节，强制使用 Toc 章节名", rule: "spin<toc" },
-          { name: "根据 Spin 获取章节", rule: "spin" },
-          { name: "根据 Toc 获取章节，使用 Spin 补充章节名", rule: "toc+spin" },
-          { name: "根据 Toc 获取章节，强制使用 Spin 章节名", rule: "toc<spin" },
-          { name: "根据 Toc 获取章节", rule: "toc" }
+          {
+            name: "content-analysis-with-catalog-title-fill",
+            rule: "spin+toc"
+          },
+          {
+            name: "content-analysis-with-catalog-title-priority",
+            rule: "spin<toc"
+          },
+          { name: "content-analysis", rule: "spin" },
+          { name: "catalog-with-content-title-fill", rule: "toc+spin" },
+          { name: "catalog-with-content-title-priority", rule: "toc<spin" },
+          { name: "catalog", rule: "toc" }
         ];
       }
     }
@@ -161,20 +169,25 @@ export default {
       this.refreshLoading = true;
       this.$emit("refresh");
     },
+    ruleLabel(rule) {
+      const key = `catalog.rule.${rule.rule}`;
+      const label = this.$t(key);
+      return label === key ? rule.name : label;
+    },
     async changeRule() {
       const res = await this.$msgbox({
-        title: "修改目录规则",
+        title: this.$t("catalog.modifyCatalogRule"),
         message: this.renderComp(),
         showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
+        confirmButtonText: this.$t("common.confirm"),
+        cancelButtonText: this.$t("common.cancel")
       }).catch(action => {
         return action === "close" ? "close" : false;
       });
       if (res === "confirm") {
         //
         if (this.tocUrl === this.book.tocUrl) {
-          this.$message.error("未修改规则");
+          this.$message.error(this.$t("catalog.ruleUnchanged"));
           return;
         }
         const shelfBook = this.$store.getters.shelfBooks.find(
@@ -184,14 +197,18 @@ export default {
         return Axios.post(this.api + "/saveBook", shelfBook).then(
           res => {
             if (res.data.isSuccess) {
-              this.$message.success("操作成功");
+              this.$message.success(this.$t("common.operationSuccess"));
               this.$store.commit("updateShelfBook", res.data.data);
               this.refreshLoading = true;
               this.$emit("refresh");
             }
           },
           error => {
-            this.$message.error("操作失败" + (error && error.toString()));
+            this.$message.error(
+              this.$t("common.operationFailed", {
+                message: error && error.toString()
+              })
+            );
           }
         );
       } else {
@@ -207,19 +224,19 @@ export default {
           window.custComp2 = this;
           return (
             <div style={{ textAlign: "center" }}>
-              <span>请选择规则：</span>
+              <span>{catalog.$t("catalog.chooseRule")}:</span>
               <el-select
                 size="mini"
                 vModel={this.selectedRule}
                 filterable={true}
-                placeholder="未分组"
+                placeholder={catalog.$t("book.ungrouped")}
                 vOn:change={this.change}
               >
                 {tocRuleList.map((rule, index) => {
                   return (
                     <el-option
                       key={"rule-" + index}
-                      label={rule.name}
+                      label={catalog.ruleLabel(rule)}
                       value={rule.rule}
                     ></el-option>
                   );

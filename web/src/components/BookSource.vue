@@ -1,14 +1,14 @@
-<template>
+﻿<template>
   <div class="popup-wrapper" :style="popupTheme">
     <div class="title-zone">
-      <div class="title">来源({{ bookSource.length }})</div>
+      <div class="title">{{ $t("book.origin") }}({{ bookSource.length }})</div>
       <div :class="{ 'title-btn': true, loading: loadingMore }">
         <el-select
           size="mini"
           v-model="bookSourceGroup"
           class="booksource-group-select"
           filterable
-          placeholder="全部分组"
+          :placeholder="$t('group.all')"
         >
           <el-option
             v-for="(item, index) in $store.getters.bookSourceGroupList"
@@ -20,14 +20,18 @@
         </el-select>
         <span :class="{ loading: loading }" @click="refresh">
           <i class="el-icon-loading" v-if="loading"></i>
-          {{ loading ? "刷新中..." : "刷新" }}
+          {{ loading ? $t("common.refreshing") : $t("common.refresh") }}
         </span>
         <span
           :class="{ loading: loadingMore }"
           @click="searchBookSourceByEventStream"
         >
           <i class="el-icon-loading" v-if="loadingMore"></i>
-          {{ loadingMore ? "加载中..." : "加载更多" }}
+          {{
+            loadingMore
+              ? $t("contentSearch.loading")
+              : $t("contentSearch.loadMore")
+          }}
         </span>
       </div>
     </div>
@@ -54,7 +58,7 @@
             </div>
           </div>
           <div class="source-latest-chapter">
-            {{ searchBook.latestChapterTitle || "无最新章节" }}
+            {{ searchBook.latestChapterTitle || $t("book.noLatestChapter") }}
           </div>
         </div>
       </div>
@@ -139,7 +143,9 @@ export default {
         error => {
           this.loading = false;
           this.$message.error(
-            "获取书籍来源信息失败 " + (error && error.toString())
+            this.$t("bookSource.loadInfoFailed", {
+              message: error && error.toString()
+            })
           );
           throw error;
         }
@@ -148,7 +154,7 @@ export default {
     async changeBookSource(searchBook) {
       const isInShelf = await this.$root.$children[0].isInShelf(
         this.$store.getters.readingBook,
-        "加入书架之后才能切换书源, 是否加入书架?"
+        this.$t("bookSource.confirmAddBeforeChange")
       );
       if (!isInShelf) {
         return;
@@ -160,7 +166,7 @@ export default {
       }).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.info("换源成功");
+            this.$message.info(this.$t("bookSource.changeSuccess"));
             var book = Object.assign({}, this.$store.getters.readingBook);
             book.bookUrl = searchBook.bookUrl;
             book.type =
@@ -174,7 +180,6 @@ export default {
             this.$store.commit("setReadingBook", book);
             this.$emit("changeBookSource");
 
-            // 重新加载书架
             Axios.get(this.api + `/getBookshelf`, {}).then(
               res => {
                 if (res.data.isSuccess) {
@@ -188,7 +193,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("换源失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("bookSource.changeFailed", {
+              message: error && error.toString()
+            })
+          );
           throw error;
         }
       );
@@ -225,7 +234,9 @@ export default {
         error => {
           this.loadingMore = false;
           this.$message.error(
-            "加载更多书籍来源失败 " + (error && error.toString())
+            this.$t("bookSource.loadMoreFailed", {
+              message: error && error.toString()
+            })
           );
           throw error;
         }
@@ -293,7 +304,7 @@ export default {
             }
           }
           if (this.bookSource.length === oldBookSourceLength) {
-            this.$message.error("没有更多啦");
+            this.$message.error(this.$t("common.noMore"));
           }
         } catch (error) {
           //

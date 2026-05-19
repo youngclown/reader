@@ -1,10 +1,12 @@
-<template>
+﻿<template>
   <div class="popup-wrapper" :style="popupTheme">
     <div class="title-zone">
-      <div class="title">书海</div>
+      <div class="title">{{ $t("home.explore") }}</div>
       <div :class="{ 'title-btn': true }">
         <span class="source-count">
-          共{{ bookSourceShowLength }}个可用书源
+          {{
+            $t("bookSource.availableSources", { count: bookSourceShowLength })
+          }}
         </span>
         <i
           class="el-icon-close close-btn"
@@ -23,7 +25,7 @@
         :key="'sourceGroup-' + name"
         @click="setSourceGroup(name)"
       >
-        {{ name }}
+        {{ name === "ungrouped" ? $t("book.ungrouped") : name }}
       </el-tag>
     </div>
     <div
@@ -46,7 +48,7 @@
             ref="source"
             v-show="
               !sourceGroup ||
-                (sourceGroup === '未分组' && source.bookSourceGroup === '') ||
+                (sourceGroup === 'ungrouped' && source.bookSourceGroup === '') ||
                 source.bookSourceGroup === sourceGroup
             "
           >
@@ -121,7 +123,7 @@ export default {
       this.bookSourceListNew.forEach(v => {
         v.bookSourceGroup && groups.add(v.bookSourceGroup);
       });
-      groups.add("未分组");
+      groups.add("ungrouped");
       return Array.from(groups);
     },
     bookSourceShowLength() {
@@ -129,7 +131,7 @@ export default {
         return this.bookSourceListNew.length;
       }
       return this.bookSourceListNew.filter(v =>
-        this.sourceGroup === "未分组"
+        this.sourceGroup === "ungrouped"
           ? !v.bookSourceGroup
           : v.bookSourceGroup === this.sourceGroup
       ).length;
@@ -157,12 +159,8 @@ export default {
       let zone = [];
       let exploreUrlList = [];
       try {
-        // 由于是在客户端解析，所以不支持解析 <js> 和 @js: 开头的 exploreUrl
-        // [{\"title\":\"玄幻奇幻\",\"url\":\"\/xuanhuan\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"武侠仙侠\",\"url\":\"\/wuxia\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"都市生活\",\"url\":\"\/dushi\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"历史军事\",\"url\":\"\/lishi\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"游戏竞技\",\"url\":\"\/youxi\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"科幻未来\",\"url\":\"\/kehuan\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"幻想奇缘\",\"url\":\"\/huanxiang\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"古代言情\",\"url\":\"\/gudai\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"二次い元\",\"url\":\"\/erciyuan\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"现代言情\",\"url\":\"\/xiandai\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"浪漫青春\",\"url\":\"\/qingchun\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}},{\"title\":\"其他类型\",\"url\":\"\/qita\/{{page}}.html\",\"style\":{\"layout_flexGrow\":0.25}}]
-        // 尝试解析为 JSON
         exploreUrlList = JSON.parse(bookSource.exploreUrl);
       } catch (error) {
-        // 有些源的 key 是单引号的，尝试用 JS 解析
         try {
           exploreUrlList = new Function("return " + bookSource.exploreUrl)();
         } catch (error) {
@@ -173,7 +171,6 @@ export default {
       if (Array.isArray(exploreUrlList) && exploreUrlList.length) {
         let percent = 0;
         exploreUrlList.forEach(v => {
-          // 只考虑 layout_flexBasisPercent 样式
           const basisPercent =
             (v.style && v.style.layout_flexBasisPercent) || 0.25;
           zone.push({
@@ -182,21 +179,18 @@ export default {
           });
           percent += basisPercent;
           if (percent >= 1) {
-            // percent 超过1, 分割为一块
             result.push(zone);
             zone = [];
             percent = 0;
           }
         });
       } else {
-        // 解析为 字符串
         bookSource.exploreUrl
           .replace(/\r\n/g, "\n")
           .split("\n")
           .forEach(v => {
             if (!v) {
               if (zone.length) {
-                // 出现空行，分割为一块
                 result.push(zone);
                 zone = [];
               }
@@ -245,7 +239,7 @@ export default {
               });
               this.exploreList = data;
               if (data.length === length) {
-                this.$message.error("没有更多啦");
+                this.$message.error(this.$t("common.noMore"));
               }
             }
             // console.log(this.exploreList);
@@ -253,7 +247,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("探索失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("bookSource.exploreFailed", {
+              message: error && error.toString()
+            })
+          );
           throw error;
         }
       );

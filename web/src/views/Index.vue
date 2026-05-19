@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div
     class="index-wrapper"
     :class="{
@@ -20,18 +20,18 @@
     >
       <div class="navigation-inner-wrapper">
         <div class="navigation-title">
-          阅读
+          {{ $t("app.title") }}
           <span class="version-text" @click="updateForce">{{
             $store.state.version
           }}</span>
         </div>
         <div class="navigation-sub-title">
-          清风不识字，何故乱翻书
+          {{ $t("app.subtitle") }}
         </div>
         <div class="search-wrapper">
           <el-input
             size="mini"
-            placeholder="搜索书籍"
+            :placeholder="$t('search.placeholder')"
             v-model="search"
             class="search-input"
             @keyup.enter.native="searchBook(1)"
@@ -41,7 +41,7 @@
         </div>
         <div class="setting-wrapper search-setting">
           <div class="setting-title">
-            搜索设置
+            {{ $t("search.settings") }}
           </div>
           <div class="setting-item">
             <el-select
@@ -49,12 +49,12 @@
               v-model="searchConfig.searchType"
               class="setting-select"
               filterable
-              placeholder="请选择搜索方式"
+              :placeholder="$t('search.typePlaceholder')"
             >
               <el-option
                 v-for="(item, index) in searchTypeList"
                 :key="'search-type-' + index"
-                :label="item.name"
+                :label="$t(item.nameKey)"
                 :value="item.value"
               >
               </el-option>
@@ -69,7 +69,7 @@
               v-model="searchConfig.bookSourceUrl"
               class="setting-select"
               filterable
-              placeholder="请选择搜索书源"
+              :placeholder="$t('search.sourcePlaceholder')"
             >
               <el-option
                 v-for="(item, index) in bookSourceList"
@@ -89,7 +89,7 @@
               v-model="searchConfig.bookSourceGroup"
               class="setting-select"
               filterable
-              placeholder="请选择搜索书源分组"
+              :placeholder="$t('search.sourceGroupPlaceholder')"
             >
               <el-option
                 v-for="(item, index) in bookSourceGroupList"
@@ -109,12 +109,12 @@
               v-model="searchConfig.concurrentCount"
               class="setting-select"
               filterable
-              placeholder="请选择并发线程"
+              :placeholder="$t('search.concurrentPlaceholder')"
             >
               <el-option
                 v-for="(item, index) in concurrentList"
                 :key="'source-' + index"
-                :label="item + '并发线程'"
+                :label="$t('search.concurrentThreads', { count: item })"
                 :value="item"
               >
               </el-option>
@@ -123,7 +123,7 @@
         </div>
         <div class="recent-wrapper">
           <div class="recent-title">
-            最近阅读
+            {{ $t("home.recentReading") }}
           </div>
           <div class="reading-recent">
             <el-tag
@@ -139,7 +139,7 @@
         </div>
         <div class="setting-wrapper">
           <div class="setting-title">
-            后端设定
+            {{ $t("home.backend") }}
           </div>
           <div class="setting-item">
             <el-tag
@@ -155,7 +155,7 @@
         </div>
         <div class="setting-wrapper">
           <div class="setting-title">
-            书源设置
+            {{ $t("home.sourceSettings") }}
           </div>
           <div class="setting-item">
             <el-tag
@@ -164,7 +164,7 @@
               class="setting-btn"
               @click="showBookSourceManageDialog = true"
             >
-              书源管理
+              {{ $t("home.sourceManage") }}
             </el-tag>
             <el-popover
               placement="right"
@@ -190,7 +190,7 @@
                 class="setting-btn"
                 @click="showNavigation = false"
               >
-                探索书源
+                {{ $t("home.sourceExplore") }}
               </el-tag>
             </el-popover>
             <el-tag
@@ -199,7 +199,7 @@
               class="setting-btn"
               @click="uploadBookSource"
             >
-              导入书源
+              {{ $t("home.sourceImport") }}
             </el-tag>
             <el-tag
               type="info"
@@ -207,7 +207,7 @@
               class="setting-btn"
               @click="loadRemoteBookSource"
             >
-              远程书源
+              {{ $t("home.sourceRemote") }}
             </el-tag>
             <el-tag
               type="info"
@@ -215,7 +215,7 @@
               class="setting-btn"
               @click="showFailureBookSource()"
             >
-              失效书源
+              {{ $t("home.sourceInvalid") }}
             </el-tag>
             <el-tag
               type="info"
@@ -223,7 +223,7 @@
               class="setting-btn"
               @click="debugBookSource()"
             >
-              调试书源
+              {{ $t("home.sourceDebug") }}
             </el-tag>
             <input
               ref="fileRef"
@@ -235,7 +235,7 @@
         </div>
         <div class="setting-wrapper">
           <div class="setting-title">
-            书架设置
+            {{ $t("home.shelfSettings") }}
           </div>
           <div class="setting-item">
             <el-tag
@@ -244,7 +244,7 @@
               class="setting-btn"
               @click="showBookManage"
             >
-              书籍管理
+              {{ $t("home.bookManage") }}
             </el-tag>
             <el-tag
               type="info"
@@ -252,7 +252,7 @@
               class="setting-btn"
               @click="showManageBookGroup"
             >
-              分组管理
+              {{ $t("home.groupManage") }}
             </el-tag>
             <el-tag
               type="info"
@@ -260,7 +260,7 @@
               class="setting-btn"
               @click="importLocalBook"
             >
-              导入书籍
+              {{ $t("home.bookImport") }}
             </el-tag>
             <input
               ref="bookRef"
@@ -279,7 +279,7 @@
                   $store.state.userInfo.enableLocalStore
               "
             >
-              浏览书仓
+              {{ $t("home.localStore") }}
             </el-tag>
             <el-tag
               type="info"
@@ -287,25 +287,47 @@
               class="setting-btn"
               @click="init(true)"
             >
-              刷新缓存
+              {{ $t("home.refreshCache") }}
             </el-tag>
           </div>
         </div>
 
         <div class="setting-wrapper">
           <div class="setting-title">
-            用户空间
+            {{ $t("language.title") }}
+          </div>
+          <div class="setting-item">
+            <el-select
+              size="mini"
+              :value="$store.getters.config.locale || $i18n.locale"
+              class="setting-select"
+              @change="setLocaleConfig"
+            >
+              <el-option
+                v-for="locale in $localeOptions"
+                :key="'locale-' + locale"
+                :label="$t('language.' + locale)"
+                :value="locale"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+
+        <div class="setting-wrapper">
+          <div class="setting-title">
+            {{ $t("home.userSpace") }}
             <span
               class="right-text"
               v-if="$store.state.isSecureMode && $store.state.userInfo.username"
               @click="logout()"
-              >注销</span
+              >{{ $t("common.logout") }}</span
             >
             <span
               class="right-text"
               v-else
               @click="$store.commit('setShowLogin', true)"
-              >登录</span
+              >{{ $t("common.login") }}</span
             >
           </div>
           <div class="setting-item" v-if="$store.state.showManagerMode">
@@ -314,7 +336,7 @@
               v-model="userNS"
               class="setting-select"
               filterable
-              placeholder="请选择用户空间"
+              :placeholder="$t('home.userSpacePlaceholder')"
             >
               <el-option
                 v-for="(item, index) in userList"
@@ -333,7 +355,7 @@
               @click="saveUserConfig"
               v-if="localStorageAvaliable"
             >
-              备份用户配置
+              {{ $t("home.backupUserConfig") }}
             </el-tag>
             <el-tag
               type="info"
@@ -342,7 +364,7 @@
               @click="restoreUserConfig"
               v-if="localStorageAvaliable"
             >
-              同步用户配置
+              {{ $t("home.syncUserConfig") }}
             </el-tag>
             <el-tag
               type="info"
@@ -351,7 +373,7 @@
               @click="loadUserList"
               v-if="$store.state.showManagerMode"
             >
-              加载用户空间
+              {{ $t("home.loadUserSpace") }}
             </el-tag>
             <el-tag
               type="info"
@@ -360,7 +382,7 @@
               v-if="$store.state.isManagerMode"
               @click="showUserManageDialog()"
             >
-              管理用户空间
+              {{ $t("home.manageUserSpace") }}
             </el-tag>
             <el-tag
               type="info"
@@ -369,7 +391,7 @@
               v-if="$store.state.isManagerMode"
               @click="exitSecureMode"
             >
-              退出管理模式
+              {{ $t("home.exitManagerMode") }}
             </el-tag>
           </div>
         </div>
@@ -389,7 +411,7 @@
               class="setting-btn"
               @click="showWebDAVManageDialog = true"
             >
-              文件管理
+              {{ $t("home.fileManage") }}
             </el-tag>
             <el-tag
               type="info"
@@ -397,13 +419,13 @@
               class="setting-btn"
               @click="backupToWebdav"
             >
-              保存备份
+              {{ $t("home.saveBackup") }}
             </el-tag>
           </div>
         </div>
         <div class="setting-wrapper">
           <div class="setting-title">
-            其它
+            {{ $t("home.other") }}
           </div>
           <div class="setting-item">
             <el-tag
@@ -412,7 +434,7 @@
               class="setting-btn"
               @click="showMPCode"
             >
-              关注公众号【假装大佬】
+              {{ $t("home.followOfficialAccount") }}
             </el-tag>
             <el-tag
               type="info"
@@ -420,13 +442,13 @@
               class="setting-btn"
               @click="joinTGChannel"
             >
-              加入TG频道【假装大佬】
+              {{ $t("home.joinTelegram") }}
             </el-tag>
           </div>
         </div>
         <div class="setting-wrapper">
           <div class="setting-title">
-            本地缓存
+            {{ $t("home.localCache") }}
             <span class="right-text">{{ localCacheStats.total }}</span>
           </div>
           <div class="setting-item">
@@ -436,7 +458,7 @@
               class="setting-btn"
               @click="clearCache('bookSourceList')"
             >
-              清空书源缓存
+              {{ $t("home.clearBookSourceCache") }}
               <span>{{ localCacheStats.bookSourceList }}</span>
             </el-tag>
             <el-tag
@@ -445,7 +467,7 @@
               class="setting-btn"
               @click="clearCache('rssSources')"
             >
-              清空RSS源缓存
+              {{ $t("home.clearRssCache") }}
               <span>{{ localCacheStats.rssSources }}</span>
             </el-tag>
             <el-tag
@@ -454,7 +476,7 @@
               class="setting-btn"
               @click="clearCache('chapterList')"
             >
-              清空章节列表缓存
+              {{ $t("home.clearChapterListCache") }}
               <span>{{ localCacheStats.chapterList }}</span>
             </el-tag>
             <el-tag
@@ -463,7 +485,7 @@
               class="setting-btn"
               @click="clearCache('chapterContent')"
             >
-              清空章节内容缓存
+              {{ $t("home.clearChapterContentCache") }}
               <span>{{ localCacheStats.chapterContent }}</span>
             </el-tag>
           </div>
@@ -503,14 +525,20 @@
           v-if="$store.getters.isNormalPage && collapseMenu"
           @click.stop="toggleMenu"
         ></i>
-        {{ isSearchResult ? (isExploreResult ? "探索" : "搜索") : "书架" }}
+        {{
+          isSearchResult
+            ? isExploreResult
+              ? $t("home.explore")
+              : $t("home.search")
+            : $t("reader.shelf")
+        }}
         ({{ bookList.length }})
         <div
           class="title-btn"
           v-if="$store.getters.isNormalPage && isSearchResult"
           @click="backToShelf"
         >
-          书架
+          {{ $t("reader.shelf") }}
         </div>
         <div
           class="title-btn"
@@ -518,18 +546,22 @@
           @click="loadMore"
         >
           <i class="el-icon-loading" v-if="loadingMore"></i>
-          {{ loadingMore ? "加载中..." : "加载更多" }}
+          {{
+            loadingMore
+              ? $t("contentSearch.loading")
+              : $t("contentSearch.loadMore")
+          }}
         </div>
         <div
           class="title-btn"
           v-if="$store.getters.isNormalPage && !isSearchResult"
           @click="showBookEditButton = !showBookEditButton"
         >
-          {{ showBookEditButton ? "取消" : "编辑" }}
+          {{ showBookEditButton ? $t("common.cancel") : $t("common.edit") }}
         </div>
         <div class="title-btn" v-if="!isSearchResult" @click="refreshShelf">
           <i class="el-icon-loading" v-if="refreshLoading"></i>
-          {{ refreshLoading ? "刷新中..." : "刷新" }}
+          {{ refreshLoading ? $t("common.refreshing") : $t("common.refresh") }}
         </div>
         <div
           class="title-btn"
@@ -545,7 +577,7 @@
             $store.getters.isNormalPage && !(isSearchResult && !isExploreResult)
           "
         >
-          书海
+          {{ $t("home.explore") }}
         </div>
       </div>
       <div class="book-group-wrapper" v-if="!isSearchResult">
@@ -626,18 +658,22 @@
                 </div>
                 <div class="dot" v-if="book.totalChapterNum">•</div>
                 <div class="size" v-if="book.totalChapterNum">
-                  共{{ book.totalChapterNum }}章
+                  {{
+                    $t("book.totalChapters", { count: book.totalChapterNum })
+                  }}
                 </div>
               </div>
               <div
                 class="dur-chapter"
                 v-if="!isSearchResult && book.durChapterTitle"
               >
-                已读：{{ book.durChapterTitle }}
+                {{ $t("book.read") }}{{ book.durChapterTitle }}
               </div>
               <div class="last-chapter" v-if="book.latestChapterTitle">
                 {{
-                  book.lastCheckTime ? dateFormat(book.lastCheckTime) : "最新"
+                  book.lastCheckTime
+                    ? dateFormat(book.lastCheckTime)
+                    : $t("book.latest")
                 }}：{{ book.latestChapterTitle }}
               </div>
               <div v-if="isSearchResult">
@@ -647,7 +683,7 @@
                   class="setting-connect"
                   @click.stop="addBookToShelf(book)"
                 >
-                  加入书架
+                  {{ $t("book.addToShelf") }}
                 </el-tag>
               </div>
             </div>
@@ -656,7 +692,11 @@
       </div>
     </div>
     <el-dialog
-      :title="isImportRssSource ? '导入RSS源' : '导入书源'"
+      :title="
+        isImportRssSource
+          ? $t('source.importRss')
+          : $t('source.importBookSource')
+      "
       :visible.sync="showImportSourceDialog"
       :width="dialogWidth"
       :top="this.collapseMenu ? '0' : '15vh'"
@@ -688,20 +728,22 @@
           border
           size="medium"
           class="float-left"
-          >全选</el-checkbox
+          >{{ $t("source.selectAll") }}</el-checkbox
         >
-        <span class="check-tip">已选择 {{ checkedSourceIndex.length }} 个</span>
+        <span class="check-tip">{{
+          $t("common.selectedCount", { count: checkedSourceIndex.length })
+        }}</span>
         <el-button
           size="medium"
           @click="
             showImportSourceDialog = false;
             checkedSourceIndex = [];
           "
-          >取消</el-button
+          >{{ $t("common.cancel") }}</el-button
         >
-        <el-button size="medium" type="primary" @click="saveSourceList"
-          >确定</el-button
-        >
+        <el-button size="medium" type="primary" @click="saveSourceList">{{
+          $t("common.confirm")
+        }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -718,40 +760,44 @@
     >
       <div class="custom-dialog-title" slot="title">
         <span class="el-dialog__title"
-          >{{ isShowFailureBookSource ? "失效书源管理" : "书源管理" }}
+          >{{
+            isShowFailureBookSource
+              ? $t("home.sourceInvalid")
+              : $t("home.sourceManage")
+          }}
           <span
             v-if="!isShowFailureBookSource"
             class="float-right span-btn"
             @click="deleteAllBookSource()"
-            >清空</span
+            >{{ $t("common.clear") }}</span
           >
           <span
             v-if="!isShowFailureBookSource"
             class="float-right span-btn"
             @click="deleteBookSourceFile()"
-            >恢复默认</span
+            >{{ $t("common.restoreDefault") }}</span
           >
           <span
             v-if="!isShowFailureBookSource"
             class="float-right span-btn"
             @click="exportBookSource()"
-            >导出</span
+            >{{ $t("common.export") }}</span
           >
           <span
             v-if="!isShowFailureBookSource"
             class="float-right span-btn"
             @click="editBookSource(false)"
-            >新增</span
+            >{{ $t("common.add") }}</span
           >
         </span>
       </div>
       <div class="source-container table-container">
         <div class="check-form" v-if="isShowFailureBookSource">
-          <span class="check-form-label">搜索词：</span>
+          <span class="check-form-label">{{ $t("source.searchWord") }}</span>
           <el-input v-model="checkBookSourceConfig.keyword" size="small">
           </el-input>
           <span class="check-form-label" style="min-width: 68px;">
-            超时(ms)：
+            {{ $t("reader.speechTimer") }}(ms):
           </span>
           <el-input-number
             v-model="checkBookSourceConfig.timeout"
@@ -761,7 +807,9 @@
             size="small"
           >
           </el-input-number>
-          <span class="check-form-label">并发数：</span>
+          <span class="check-form-label">{{
+            $t("source.concurrentCount")
+          }}</span>
           <el-input-number
             v-model="checkBookSourceConfig.concurrent"
             :min="3"
@@ -781,7 +829,7 @@
             :key="'sourceGroup-' + name"
             @click="setShowSourceGroup(name)"
           >
-            {{ name }}
+            {{ name === "ungrouped" ? $t("book.ungrouped") : name }}
           </el-tag>
         </div>
         <el-table
@@ -801,13 +849,13 @@
           </el-table-column>
           <el-table-column
             property="bookSourceName"
-            label="书源名称"
+            :label="$t('source.sourceName')"
             min-width="120"
             :fixed="$store.state.miniInterface"
           ></el-table-column>
           <el-table-column
             property="bookSourceUrl"
-            label="书源链接"
+            :label="$t('source.sourceUrl')"
             min-width="120"
           >
             <template slot-scope="scope">
@@ -821,24 +869,24 @@
           </el-table-column>
           <el-table-column
             property="errorMsg"
-            label="错误信息"
+            :label="$t('source.errorInfo')"
             min-width="120"
             v-if="isShowFailureBookSource"
           ></el-table-column>
-          <el-table-column label="书架书籍" min-width="120">
+          <el-table-column :label="$t('source.shelfBooks')" min-width="120">
             <template slot-scope="scope">
               <pre>{{ showSourceBook(scope.row) }}</pre>
             </template>
           </el-table-column>
           <el-table-column
-            label="操作"
+            :label="$t('group.operation')"
             width="100px"
             v-if="!isShowFailureBookSource"
           >
             <template slot-scope="scope">
-              <el-button type="text" @click="editBookSource(scope.row)"
-                >编辑</el-button
-              >
+              <el-button type="text" @click="editBookSource(scope.row)">{{
+                $t("common.edit")
+              }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -860,28 +908,28 @@
           class="float-left"
           size="medium"
           @click="deleteBookSourceList"
-          >批量删除</el-button
+          >{{ $t("book.batchDelete") }}</el-button
         >
-        <span class="check-tip"
-          >已选择 {{ manageSourceSelection.length }} 个</span
-        >
+        <span class="check-tip">{{
+          $t("common.selectedCount", { count: manageSourceSelection.length })
+        }}</span>
         <el-button
           @click="checkBookSource"
           v-if="isShowFailureBookSource"
           size="medium"
           style="margin-bottom: 5px;"
           :disabled="isCheckingBookSource"
-          >{{ isCheckingBookSource ? "正在" : "" }}检测书源
-          {{ checkBookSourceTip }}</el-button
+          >{{ isCheckingBookSource ? $t("common.checking") : ""
+          }}{{ $t("source.checkSources") }} {{ checkBookSourceTip }}</el-button
         >
-        <el-button @click="showBookSourceManageDialog = false" size="medium"
-          >取消</el-button
-        >
+        <el-button @click="showBookSourceManageDialog = false" size="medium">{{
+          $t("common.cancel")
+        }}</el-button>
       </div>
     </el-dialog>
 
     <el-dialog
-      :title="'导入本地书籍' + importMultiBookTip"
+      :title="$t('source.importLocalBook') + importMultiBookTip"
       :visible.sync="showImportBookDialog"
       :width="dialogSmallWidth"
       :top="dialogTop"
@@ -904,22 +952,22 @@
           </div>
           <div class="book-info">
             <div>
-              <span>书名：</span>
+              <span>{{ $t("source.bookName") }}</span>
               <el-input v-model="importBookInfo.name" size="small"> </el-input>
             </div>
             <div>
-              <span>作者：</span>
+              <span>{{ $t("source.author") }}</span>
               <el-input v-model="importBookInfo.author" size="small">
               </el-input>
             </div>
             <div>
-              <span>分组：</span>
+              <span>{{ $t("source.group") }}</span>
               <el-select
                 size="mini"
                 v-model="importBookGroup"
                 filterable
                 multiple
-                placeholder="未分组"
+                :placeholder="$t('book.ungrouped')"
               >
                 <el-option
                   v-for="(bookGroup, index) in bookGroupSetList"
@@ -931,12 +979,12 @@
               </el-select>
             </div>
             <div v-if="isShowTocRule">
-              <span>规则：</span>
+              <span>{{ $t("source.rule") }}</span>
               <el-select
                 size="mini"
                 v-model="importUsedTxtRule"
                 filterable
-                placeholder="内置规则"
+                :placeholder="$t('catalog.builtInRules')"
               >
                 <el-option
                   v-for="(rule, index) in tocRuleList"
@@ -950,7 +998,7 @@
                 class="toc-refresh-btn"
                 type="text"
                 @click="getChapterListByRule()"
-                >刷新目录</el-button
+                >{{ $t("source.refreshCatalog") }}</el-button
               >
             </div>
             <div v-if="isShowTocRule">
@@ -965,7 +1013,7 @@
           </div>
         </div>
         <div class="chapter-title">
-          章节列表({{ importBookChapters.length }})
+          {{ $t("book.chapterList") }}({{ importBookChapters.length }})
         </div>
         <div
           class="chapter-list"
@@ -981,11 +1029,11 @@
           type="primary"
           size="medium"
           @click="saveBook(importBookInfo, true)"
-          >确定导入</el-button
+          >{{ $t("source.confirmImport") }}</el-button
         >
-        <el-button size="medium" @click="showImportBookDialog = false"
-          >取消</el-button
-        >
+        <el-button size="medium" @click="showImportBookDialog = false">{{
+          $t("common.cancel")
+        }}</el-button>
       </div>
     </el-dialog>
 
@@ -1025,8 +1073,8 @@ export default {
     return {
       search: "",
       searchTypeList: [
-        { name: "单源搜索", value: "single" },
-        { name: "多源搜索(过滤书名/作者名)", value: "multi" }
+        { nameKey: "search.single", value: "single" },
+        { nameKey: "search.multi", value: "multi" }
       ],
       isSearchResult: false,
       isExploreResult: false,
@@ -1075,7 +1123,7 @@ export default {
         size: 25
       },
       checkBookSourceConfig: {
-        keyword: "斗罗大陆",
+        keyword: "",
         timeout: 5000,
         concurrent: 5
       },
@@ -1167,13 +1215,12 @@ export default {
     },
     showBookGroup() {
       this.$nextTick(() => {
-        // 手动处理 el-image 图片加载
         setTimeout(this.ensureLoadBookCover);
       });
     }
   },
   mounted() {
-    document.title = "阅读";
+    document.title = this.$t("app.title");
     this.navigationClass =
       this.collapseMenu && !this.showNavigation ? "navigation-hidden" : "";
     window.shelfPage = this;
@@ -1192,49 +1239,57 @@ export default {
     });
   },
   activated() {
-    document.title = "阅读";
+    document.title = this.$t("app.title");
     this.scanCacheStorage();
   },
   methods: {
     init(refresh) {
       this.$root.$children[0].init(refresh);
     },
+    setLocaleConfig(locale) {
+      this.$store.commit("setConfig", {
+        ...this.$store.getters.config,
+        locale
+      });
+    },
     setIP() {
-      this.$prompt("请输入接口地址 ( 如：localhost:8080/reader3 )", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        inputValue: this.api,
-        // inputPattern: /^((2[0-4]\d|25[0-5]|[1]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[1]?\d\d?):([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-6][0-5][0-5][0-3][0-5])$/,
-        // inputErrorMessage: "url 形式不正确",
-        beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            this.connecting = true;
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "校验中……";
-            var inputUrl = instance.inputValue.replace(/\/*$/g, "");
-            this.loadBookshelf(inputUrl)
-              .then(() => {
-                this.connecting = false;
-                instance.confirmButtonLoading = false;
-                done();
-                setCache("api_prefix", inputUrl);
-                this.$store.commit("setApi", inputUrl);
-                // 初始化
-                this.init();
-              })
-              .catch(() => {
-                instance.confirmButtonLoading = false;
-                instance.confirmButtonText = "确定";
-              });
-          } else {
-            done();
+      this.$prompt(
+        this.$t("home.backendPromptMessage"),
+        this.$t("home.backendPromptTitle"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          inputValue: this.api,
+          // inputPattern: /^((2[0-4]\d|25[0-5]|[1]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[1]?\d\d?):([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-6][0-5][0-5][0-3][0-5])$/,
+          beforeClose: (action, instance, done) => {
+            if (action === "confirm") {
+              this.connecting = true;
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = this.$t("common.validating");
+              var inputUrl = instance.inputValue.replace(/\/*$/g, "");
+              this.loadBookshelf(inputUrl)
+                .then(() => {
+                  this.connecting = false;
+                  instance.confirmButtonLoading = false;
+                  done();
+                  setCache("api_prefix", inputUrl);
+                  this.$store.commit("setApi", inputUrl);
+                  this.init();
+                })
+                .catch(() => {
+                  instance.confirmButtonLoading = false;
+                  instance.confirmButtonText = this.$t("common.confirm");
+                });
+            } else {
+              done();
+            }
           }
         }
-      })
+      )
         .then(({ value }) => {
           this.$message({
             type: "success",
-            message: "与" + value + "连接成功"
+            message: this.$t("home.backendConnectSuccess", { value })
           });
         })
         .catch(() => {});
@@ -1242,7 +1297,7 @@ export default {
     loadBookshelf(api, refresh) {
       api = api || this.api;
       if (!api) {
-        this.$message.error("请先设置后端接口地址");
+        this.$message.error(this.$t("source.needBackendApi"));
         this.$store.commit("setConnected", false);
         return Promise.reject(false);
       }
@@ -1251,7 +1306,9 @@ export default {
         this.loading = this.$loading({
           target: this.$refs.bookList,
           lock: true,
-          text: refresh ? "正在刷新书籍信息" : "正在获取书籍信息",
+          text: refresh
+            ? this.$t("book.refreshingInfo")
+            : this.$t("book.loadingInfo"),
           spinner: "el-icon-loading",
           background: this.isNight ? "#222" : "#fff"
         });
@@ -1280,18 +1337,18 @@ export default {
     },
     searchBook(page) {
       if (!this.$store.state.connected) {
-        this.$message.error("后端未连接");
+        this.$message.error(this.$t("source.backendDisconnected"));
         return;
       }
       if (!this.search) {
-        this.$message.error("请输入关键词进行搜索");
+        this.$message.error(this.$t("source.keywordRequired"));
         return;
       }
       if (
         this.searchConfig.searchType === "single" &&
         !this.searchConfig.bookSourceUrl
       ) {
-        this.$message.error("请选择书源进行搜索");
+        this.$message.error(this.$t("source.sourceRequired"));
         return;
       }
       if (page) {
@@ -1299,7 +1356,6 @@ export default {
       }
       page = this.searchPage;
       if (page === 1) {
-        // 重新搜索
         this.searchLastIndex = -1;
       }
       if (this.searchConfig.searchType === "multi" && window.EventSource) {
@@ -1325,8 +1381,8 @@ export default {
           bookSourceUrl: this.searchConfig.bookSourceUrl,
           bookSourceGroup: this.searchConfig.bookSourceGroup,
           concurrentCount: this.searchConfig.concurrentCount,
-          lastIndex: this.searchLastIndex, // 多源搜索时的索引
-          page: page // 单源搜索时的page
+          lastIndex: this.searchLastIndex,
+          page: page
         },
         {
           timeout: this.searchConfig.searchType === "single" ? 30000 : 180000
@@ -1352,12 +1408,16 @@ export default {
             });
             this.searchResult = data;
             if (data.length === length) {
-              this.$message.error("没有更多啦");
+              this.$message.error(this.$t("common.noMore"));
             }
           }
         },
         error => {
-          this.$message.error("搜索书籍失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.searchBookFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -1378,9 +1438,7 @@ export default {
       if (this.loadingMore) {
         tryClose();
         this.loadingMore = false;
-        // page === 1 是重新搜索
         if (page !== 1) {
-          // 停止搜索
           return;
         }
       }
@@ -1390,8 +1448,8 @@ export default {
         bookSourceUrl: this.searchConfig.bookSourceUrl,
         bookSourceGroup: this.searchConfig.bookSourceGroup,
         concurrentCount: this.searchConfig.concurrentCount,
-        lastIndex: this.searchLastIndex, // 多源搜索时的索引
-        page: page // 单源搜索时的page
+        lastIndex: this.searchLastIndex,
+        page: page
       };
 
       this.isSearchResult = true;
@@ -1433,7 +1491,7 @@ export default {
             }
           }
           if (this.searchResult.length === oldSearchResultLength) {
-            this.$message.error("没有更多啦");
+            this.$message.error(this.$t("common.noMore"));
           }
         } catch (error) {
           //
@@ -1466,7 +1524,6 @@ export default {
         return;
       }
       if (this.isSearchResult) {
-        // this.$message.error("请先加入书架");
         // return;
       }
       this.$store.commit("setReadingBook", {
@@ -1488,8 +1545,8 @@ export default {
     },
     async addBookToShelf(book) {
       const customImportBookInfo = await this.customImportBookInfo({
-        title: "设置分组",
-        cancelButtonText: "暂不加入"
+        title: this.$t("book.setGroup"),
+        cancelButtonText: this.$t("book.skipAddToShelf")
       });
       if (customImportBookInfo === false) {
         return;
@@ -1498,7 +1555,7 @@ export default {
     },
     saveBook(book, isImport, isEdit) {
       if (!book || !book.bookUrl || !book.origin) {
-        this.$message.error("书籍信息错误");
+        this.$message.error(this.$t("source.bookInfoError"));
         return Promise.reject(false);
       }
       return Axios.post(this.api + "/saveBook", book).then(
@@ -1510,10 +1567,10 @@ export default {
             }
             this.$message.success(
               isImport
-                ? "导入书籍成功"
+                ? this.$t("book.importSuccess")
                 : isEdit
-                ? "修改书籍成功"
-                : "加入书架成功"
+                ? this.$t("book.editBookSuccess")
+                : this.$t("book.addToShelfSuccess")
             );
             if (!isEdit) {
               this.loadBookshelf();
@@ -1525,26 +1582,32 @@ export default {
         },
         error => {
           this.$message.error(
-            (isImport
-              ? "导入书籍失败"
+            isImport
+              ? this.$t("book.importFailed", {
+                  message: error && error.toString()
+                })
               : isEdit
-              ? "修改书籍失败"
-              : "加入书架失败 ") + (error && error.toString())
+              ? this.$t("book.editBookFailed", {
+                  message: error && error.toString()
+                })
+              : this.$t("book.addToShelfFailed", {
+                  message: error && error.toString()
+                })
           );
         }
       );
     },
     async deleteBook(book) {
       if (!book || (!book.name && !book.bookUrl)) {
-        this.$message.error("书籍信息错误");
+        this.$message.error(this.$t("source.bookInfoError"));
         return;
       }
       const res = await this.$confirm(
-        "此操作将删除书籍信息以及阅读进度, 是否继续?",
-        "提示",
+        this.$t("book.confirmDeleteWithProgress"),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -1557,48 +1620,52 @@ export default {
         res => {
           if (res.data.isSuccess) {
             //
-            this.$message.success("删除成功");
+            this.$message.success(this.$t("common.deleteSuccess"));
             this.loadBookshelf();
           }
         },
         error => {
-          this.$message.error("删除失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.deleteFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     editBook(book, isAdd, onSuccess) {
       if (!book || !book.name || !book.bookUrl || !book.origin) {
-        this.$message.error("书籍信息错误");
+        this.$message.error(this.$t("source.bookInfoError"));
         return;
       }
       const bookInfo = { ...book };
       delete bookInfo["variableMap$delegate"];
       eventBus.$emit(
         "showEditor",
-        isAdd ? "保存书籍" : "编辑书籍",
+        isAdd ? this.$t("book.saveBook") : this.$t("book.editBook"),
         JSON.stringify(bookInfo, null, 4),
         async (content, close) => {
           try {
             const newBook = JSON.parse(content);
             if (!newBook.name) {
-              this.$message.error("书籍名称不能为空");
+              this.$message.error(this.$t("source.bookNameRequired"));
               return;
             }
             if (!newBook.bookUrl) {
-              this.$message.error("书籍链接不能为空");
+              this.$message.error(this.$t("source.bookUrlRequired"));
               return;
             }
             if (!newBook.origin) {
-              this.$message.error("书籍来源不能为空");
+              this.$message.error(this.$t("source.bookOriginRequired"));
               return;
             }
             if (isAdd) {
               const res = await this.$confirm(
-                "加入书架之后才能编辑书籍信息, 是否加入书架?",
-                "提示",
+                this.$t("book.confirmAddBeforeEdit"),
+                this.$t("common.tip"),
                 {
-                  confirmButtonText: "确定",
-                  cancelButtonText: "取消",
+                  confirmButtonText: this.$t("common.confirm"),
+                  cancelButtonText: this.$t("common.cancel"),
                   type: "warning"
                 }
               ).catch(() => {
@@ -1615,7 +1682,7 @@ export default {
               }
             });
           } catch (e) {
-            this.$message.error("书籍信息必须是JSON格式");
+            this.$message.error(this.$t("source.bookJsonRequired"));
           }
         }
       );
@@ -1639,19 +1706,19 @@ export default {
       let str = "";
 
       if (int <= 30) {
-        str = "刚刚";
+        str = this.$t("time.justNow");
       } else if (int < 60) {
-        str = int + "秒前";
+        str = this.$t("time.secondsAgo", { count: int });
       } else if (int < 3600) {
-        str = parseInt(int / 60) + "分钟前";
+        str = this.$t("time.minutesAgo", { count: parseInt(int / 60) });
       } else if (int < 86400) {
-        str = parseInt(int / 3600) + "小时前";
+        str = this.$t("time.hoursAgo", { count: parseInt(int / 3600) });
       } else if (int < 2592000) {
-        str = parseInt(int / 86400) + "天前";
+        str = this.$t("time.daysAgo", { count: parseInt(int / 86400) });
       } else if (int < 31536000) {
-        str = parseInt(int / 2592000) + "月前";
+        str = this.$t("time.monthsAgo", { count: parseInt(int / 2592000) });
       } else {
-        str = parseInt(int / 31536000) + "年前";
+        str = this.$t("time.yearsAgo", { count: parseInt(int / 31536000) });
       }
       return str;
     },
@@ -1690,7 +1757,9 @@ export default {
       const rawFile = event.target.files && event.target.files[0];
       // console.log("rawFile", rawFile);
       const reader = new FileReader();
-      const sourceTypeName = isRssSource ? "RSS源" : "书源";
+      const sourceTypeName = isRssSource
+        ? this.$t("rss.sourceType")
+        : this.$t("source.sourceType");
       reader.onload = e => {
         const data = e.target.result;
         try {
@@ -1711,15 +1780,18 @@ export default {
             this.showImportSourceDialog = true;
             this.isImportRssSource = !!isRssSource;
           } else {
-            this.$message.error(sourceTypeName + "文件错误");
+            this.$message.error(
+              this.$t("source.sourceFileError", { type: sourceTypeName })
+            );
           }
         } catch (error) {
-          this.$message.error(sourceTypeName + "文件错误");
+          this.$message.error(
+            this.$t("source.sourceFileError", { type: sourceTypeName })
+          );
         }
       };
       reader.onerror = () => {
         // console.log("FileReader error", e);
-        // FileReader 读取出错，只能上传读取了
         let param = new FormData();
         param.append("file", rawFile);
         Axios.post(this.api + "/readSourceFile", param, {
@@ -1755,16 +1827,18 @@ export default {
                 this.showImportSourceDialog = true;
                 this.isImportRssSource = !!isRssSource;
               } else {
-                this.$message.error(sourceTypeName + "文件错误");
+                this.$message.error(
+                  this.$t("source.sourceFileError", { type: sourceTypeName })
+                );
               }
             }
           },
           error => {
             this.$message.error(
-              "读取" +
-                sourceTypeName +
-                "文件内容失败 " +
-                (error && error.toString())
+              this.$t("source.sourceFileReadFailed", {
+                type: sourceTypeName,
+                message: error && error.toString()
+              })
             );
           }
         );
@@ -1781,11 +1855,15 @@ export default {
         this.currentUserName + "@lastRemoteSourceUrl",
         ""
       );
-      const res = await this.$prompt("请输入远程书源链接", "导入远程书源文件", {
-        inputValue: lastRemoteSourceUrl || "",
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      }).catch(() => {
+      const res = await this.$prompt(
+        this.$t("source.remoteSourcePrompt"),
+        this.$t("source.remoteSourceTitle"),
+        {
+          inputValue: lastRemoteSourceUrl || "",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel")
+        }
+      ).catch(() => {
         return false;
       });
       if (!res || !res.value) {
@@ -1814,13 +1892,15 @@ export default {
               this.showImportSourceDialog = true;
               this.isImportRssSource = false;
             } else {
-              this.$message.error("远程书源文件错误");
+              this.$message.error(this.$t("source.remoteSourceFileError"));
             }
           }
         },
         error => {
           this.$message.error(
-            "读取远程书源文件内容失败 " + (error && error.toString())
+            this.$t("source.remoteSourceFileReadFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -1830,7 +1910,6 @@ export default {
       this.checkedSourceIndex = val
         ? this.importSourceList
             .map((v, i) => {
-              // 不勾选使用了 js，webview的书源
               const source = JSON.stringify(v);
               if (
                 source.indexOf("@js:") !== -1 ||
@@ -1844,7 +1923,7 @@ export default {
             .filter(v => v)
         : [];
       if (val && hasFilterd) {
-        this.$message.info("部分使用了Javascript和Webview的书源未勾选");
+        this.$message.info(this.$t("source.javascriptWebviewNotChecked"));
       }
       this.isIndeterminate = false;
     },
@@ -1869,11 +1948,11 @@ export default {
     },
     saveSourceList() {
       if (!this.$store.state.connected) {
-        this.$message.error("后端未连接");
+        this.$message.error(this.$t("source.backendDisconnected"));
         return;
       }
       if (!this.checkedSourceIndex.length) {
-        this.$message.error("请选择需要导入的源");
+        this.$message.error(this.$t("source.importSourceRequired"));
         return;
       }
       const sourceList = this.checkedSourceIndex.map(
@@ -1888,7 +1967,9 @@ export default {
           if (res.data.isSuccess) {
             //
             this.$message.success(
-              this.isImportRssSource ? "导入RSS源成功" : "导入书源成功"
+              this.isImportRssSource
+                ? this.$t("rss.importSuccess")
+                : this.$t("source.importSuccess")
             );
             if (this.isImportRssSource) {
               this.loadRssSources(true);
@@ -1902,8 +1983,13 @@ export default {
         },
         error => {
           this.$message.error(
-            (this.isImportRssSource ? "导入RSS源失败 " : "导入书源失败 ") +
-              (error && error.toString())
+            this.isImportRssSource
+              ? this.$t("rss.importFailed", {
+                  message: error && error.toString()
+                })
+              : this.$t("source.importFailed", {
+                  message: error && error.toString()
+                })
           );
         }
       );
@@ -1928,7 +2014,7 @@ export default {
     },
     getInvalidBookSources() {
       if (!this.$store.state.connected) {
-        this.$message.error("后端未连接");
+        this.$message.error(this.$t("source.backendDisconnected"));
         return;
       }
       Axios.post(this.api + "/getInvalidBookSources").then(
@@ -1950,7 +2036,7 @@ export default {
     },
     async checkBookSource() {
       if (!this.checkBookSourceConfig.keyword) {
-        this.$message.error("请输入搜索关键词");
+        this.$message.error(this.$t("source.keywordRequired"));
         return;
       }
       this.isCheckingBookSource = true;
@@ -1984,14 +2070,18 @@ export default {
     },
     async deleteBookSourceList() {
       if (!this.manageSourceSelection.length) {
-        this.$message.error("请选择需要删除的源");
+        this.$message.error(this.$t("source.sourceDeleteRequired"));
         return;
       }
-      const res = await this.$confirm("确认要删除所选择的书源吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("source.confirmDeleteSources"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -2008,12 +2098,16 @@ export default {
               this.manageSourceSelection
             );
             this.manageSourceSelection = [];
-            this.$message.success("删除书源成功");
+            this.$message.success(this.$t("source.deleteSourceSuccess"));
             this.loadBookSource(true);
           }
         },
         error => {
-          this.$message.error("删除书源失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.deleteSourceFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -2032,12 +2126,12 @@ export default {
     },
     async saveUserConfig() {
       if (!window.localStorage) {
-        this.$message.error("当前终端不支持localStorage");
+        this.$message.error(this.$t("source.localStorageUnsupported"));
         return;
       }
       const res = await this.$confirm(
-        "确认要备份当前终端的阅读配置、书架设置、搜索设置、自定义配置方案吗?",
-        "提示"
+        this.$t("source.confirmBackupUserConfig"),
+        this.$t("common.tip")
       ).catch(() => {
         return false;
       });
@@ -2056,22 +2150,26 @@ export default {
       Axios.post(this.api + "/saveUserConfig", userConfig).then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("备份成功");
+            this.$message.success(this.$t("source.backupSuccess"));
           }
         },
         error => {
-          this.$message.error("备份失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.backupFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async restoreUserConfig() {
       if (!window.localStorage) {
-        this.$message.error("当前终端不支持localStorage");
+        this.$message.error(this.$t("source.localStorageUnsupported"));
         return;
       }
       const res = await this.$confirm(
-        "确认要从备份文件中恢复当前终端的阅读配置、书架设置、搜索设置、自定义配置方案吗?",
-        "提示"
+        this.$t("source.confirmRestoreUserConfig"),
+        this.$t("common.tip")
       ).catch(() => {
         return false;
       });
@@ -2087,17 +2185,21 @@ export default {
               }
             }
             this.$store.dispatch("syncFromLocalStorage");
-            this.$message.success("恢复成功");
+            this.$message.success(this.$t("source.restoreSuccess"));
           }
         },
         error => {
-          this.$message.error("恢复失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.restoreFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     loadUserList() {
       if (!this.$store.state.connected) {
-        this.$message.error("后端未连接");
+        this.$message.error(this.$t("source.backendDisconnected"));
         return;
       }
       Axios.get(this.api + "/getUserList").then(
@@ -2113,7 +2215,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载用户空间失败 " + (error && error.toString())
+            this.$t("user.loadUserSpaceFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -2138,11 +2242,11 @@ export default {
     },
     async backupToWebdav() {
       const res = await this.$confirm(
-        `确认要用当前书源和书架信息覆盖备份文件中的书源、书架、分组和RSS订阅数据吗?`,
-        "提示",
+        this.$t("source.confirmBackupToWebdav"),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
           type: "warning"
         }
       ).catch(() => {
@@ -2154,11 +2258,15 @@ export default {
       Axios.post(this.api + "/backupToWebdav").then(
         res => {
           if (res.data.isSuccess) {
-            this.$message.success("备份成功");
+            this.$message.success(this.$t("source.backupSuccess"));
           }
         },
         error => {
-          this.$message.error("备份失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.backupFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -2166,7 +2274,6 @@ export default {
       this.lastTouch = false;
       this.lastMoveX = false;
       this.touchMoveTimes = 0;
-      // 边缘 20px 以内禁止触摸
       if (
         e.touches &&
         e.touches[0] &&
@@ -2191,7 +2298,6 @@ export default {
           e.preventDefault();
           e.stopPropagation();
           if (!this.showNavigation && moveX > 0 && moveX <= 270) {
-            // 往右拉，打开目录
             if (this.touchMoveTimes % 3 === 0) {
               this.navigationStyle = {
                 marginLeft: moveX - 270 + "px"
@@ -2199,7 +2305,6 @@ export default {
             }
             this.lastMoveX = moveX;
           } else if (this.showNavigation && moveX < 0 && moveX >= -270) {
-            // 往左拉，关闭目录
             if (this.touchMoveTimes % 3 === 0) {
               this.navigationStyle = {
                 marginLeft: moveX + "px"
@@ -2261,7 +2366,6 @@ export default {
         res => {
           if (res.data.isSuccess && res.data.data.length) {
             if (res.data.data.length > 1) {
-              // 批量导入
               this.importMultiBooks(res.data.data);
             } else {
               //
@@ -2273,7 +2377,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("上传书籍 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("file.uploadBooksFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
       this.$refs.bookRef.value = null;
@@ -2290,11 +2398,11 @@ export default {
         return;
       }
       const res = await this.$confirm(
-        `你选择导入多本书籍，请选择导入方式?`,
-        "提示",
+        this.$t("book.confirmMultiImportMode"),
+        this.$t("common.tip"),
         {
-          confirmButtonText: "批量导入",
-          cancelButtonText: "逐一确认导入",
+          confirmButtonText: this.$t("book.batchImport"),
+          cancelButtonText: this.$t("book.importOneByOne"),
           type: "warning",
           closeOnClickModal: false,
           closeOnPressEscape: false,
@@ -2366,11 +2474,11 @@ export default {
     async customImportBookInfo(options) {
       this.importBookGroup = [];
       const res = await this.$msgbox({
-        title: "统一设置分组",
+        title: this.$t("book.setGroupForAll"),
         message: this.renderComp(),
         showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消导入",
+        confirmButtonText: this.$t("common.confirm"),
+        cancelButtonText: this.$t("book.cancelImport"),
         ...(options || {})
       }).catch(action => {
         return action === "close" ? "close" : false;
@@ -2390,14 +2498,14 @@ export default {
         render() {
           return (
             <div style={{ textAlign: "center" }}>
-              <span>请选择分组：</span>
+              <span>{shelf.$t("source.selectGroup")}</span>
               <el-select
                 size="mini"
                 vModel={this.importBookGroup}
                 ref="bookGroupSelect"
                 filterable={true}
                 multiple={true}
-                placeholder="未分组"
+                placeholder={shelf.$t("book.ungrouped")}
                 vOn:change={this.change}
               >
                 {bookGroupList.map((bookGroup, index) => {
@@ -2435,18 +2543,13 @@ export default {
       eventBus.$emit("showBookGroupDialog", false);
     },
     getShowShelfBooks(bookGroup) {
-      // 处理特殊分组
       if (bookGroup === -1) {
-        // 全部
         return this.shelfBooks;
       } else if (bookGroup === -2) {
-        // 本地
         return this.shelfBooks.filter(v => v.origin === "loc_book");
       } else if (bookGroup === -3) {
-        // 音频
         return this.shelfBooks.filter(v => v.type === 1);
       } else if (bookGroup === -4) {
-        // 未分组
         return this.shelfBooks.filter(v => v.group === 0);
       }
 
@@ -2473,22 +2576,30 @@ export default {
               JSON.stringify(res.data.data || [], null, 4)
             ]);
 
-            aEle.download = "reader书源-" + this.currentDateTime() + ".json";
+            aEle.download = "reader-sources-" + this.currentDateTime() + ".json";
             aEle.href = URL.createObjectURL(blob);
             aEle.click();
           }
         },
         error => {
-          this.$message.error("导出书源失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.exportSourceFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async deleteAllBookSource() {
-      const res = await this.$confirm(`确认要清空所有书源吗?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("source.confirmClearSources"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -2498,21 +2609,29 @@ export default {
         res => {
           if (res.data.isSuccess) {
             //
-            this.$message.success("清空书源成功");
+            this.$message.success(this.$t("source.clearSourcesSuccess"));
             this.loadBookSource(true);
           }
         },
         error => {
-          this.$message.error("清空书源失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.clearSourcesFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
     async deleteBookSourceFile() {
-      const res = await this.$confirm(`确认要恢复默认书源吗?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).catch(() => {
+      const res = await this.$confirm(
+        this.$t("source.confirmRestoreDefaultSources"),
+        this.$t("common.tip"),
+        {
+          confirmButtonText: this.$t("common.confirm"),
+          cancelButtonText: this.$t("common.cancel"),
+          type: "warning"
+        }
+      ).catch(() => {
         return false;
       });
       if (!res) {
@@ -2522,12 +2641,18 @@ export default {
         res => {
           if (res.data.isSuccess) {
             //
-            this.$message.success("恢复默认书源成功");
+            this.$message.success(
+              this.$t("source.restoreDefaultSourcesSuccess")
+            );
             this.loadBookSource(true);
           }
         },
         error => {
-          this.$message.error("操作失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("common.operationFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -2535,17 +2660,17 @@ export default {
       const editHandler = data => {
         eventBus.$emit(
           "showEditor",
-          "编辑书源",
+          this.$t("source.editSource"),
           JSON.stringify(data, null, 4),
           (content, close) => {
             try {
               const source = JSON.parse(content);
               if (!source.bookSourceName) {
-                this.$message.error("书源名称不能为空");
+                this.$message.error(this.$t("source.sourceNameRequired"));
                 return;
               }
               if (!source.bookSourceUrl) {
-                this.$message.error("书源链接不能为空");
+                this.$message.error(this.$t("source.sourceUrlRequired"));
                 return;
               }
               Axios.post(this.api + "/saveBookSource", source).then(
@@ -2553,18 +2678,20 @@ export default {
                   if (res.data.isSuccess) {
                     //
                     close();
-                    this.$message.success("保存书源成功");
+                    this.$message.success(this.$t("source.saveSourceSuccess"));
                     this.loadBookSource(true);
                   }
                 },
                 error => {
                   this.$message.error(
-                    "保存书源失败 " + (error && error.toString())
+                    this.$t("source.saveSourceFailed", {
+                      message: error && error.toString()
+                    })
                   );
                 }
               );
             } catch (e) {
-              this.$message.error("书源必须是JSON格式");
+              this.$message.error(this.$t("source.sourceJsonRequired"));
             }
           }
         );
@@ -2573,7 +2700,7 @@ export default {
         editHandler({
           bookSourceComment: "",
           bookSourceGroup: "",
-          bookSourceName: "新增书源",
+          bookSourceName: this.$t("source.addSource"),
           bookSourceType: 0,
           bookSourceUrl: "",
           bookUrlPattern: "",
@@ -2615,7 +2742,9 @@ export default {
         },
         error => {
           this.$message.error(
-            "加载书源信息失败 " + (error && error.toString())
+            this.$t("source.loadSourceInfoFailed", {
+              message: error && error.toString()
+            })
           );
         }
       );
@@ -2683,7 +2812,6 @@ export default {
           };
         })
         .catch(function() {
-          // 当出错时，此处代码运行
           // console.log(err);
         });
     },
@@ -2706,7 +2834,6 @@ export default {
           };
         })
         .catch(function() {
-          // 当出错时，此处代码运行
           // console.log(err);
         });
     },
@@ -2725,7 +2852,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("注销失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("auth.logoutFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -2738,7 +2869,11 @@ export default {
           }
         },
         error => {
-          this.$message.error("注销失败 " + (error && error.toString()));
+          this.$message.error(
+            this.$t("source.refreshCatalogFailed", {
+              message: error && error.toString()
+            })
+          );
         }
       );
     },
@@ -2752,10 +2887,8 @@ export default {
       window.open("https://t.me/facker_channel", "_target");
     },
     ensureLoadBookCover() {
-      // 手动触发滚动事件，显示书籍封面图片
       this.$refs.bookList.dispatchEvent(new MouseEvent("scroll"));
 
-      // 上面一步应该能搞定，下面再确认一下
       this.$refs.bookCoverList.forEach(v => {
         if (!v.show && isInContainer(v.$el, this.$refs.bookList)) {
           // console.log("not show ", v);
@@ -2812,10 +2945,10 @@ export default {
     },
     connectStatus() {
       return this.$store.state.connected
-        ? `后端已连接`
+        ? this.$t("home.backendConnected")
         : this.connecting
-        ? "正在连接后端服务器……"
-        : "点击设置后端接口前缀";
+        ? this.$t("home.backendConnecting")
+        : this.$t("home.backendClickToSet");
     },
     connectType() {
       return this.$store.state.connected ? "success" : "danger";
@@ -2825,7 +2958,7 @@ export default {
         this.$store.getters.readingBook.name
         ? this.$store.getters.readingBook
         : {
-            name: "尚无阅读记录",
+            name: this.$t("home.noReadingRecord"),
             bookUrl: "",
             index: 0
           };
@@ -2869,7 +3002,7 @@ export default {
       });
       const groups = [
         {
-          name: "全部分组",
+          name: this.$t("group.all"),
           value: "",
           count: this.bookSourceList.length
         }
@@ -2891,7 +3024,7 @@ export default {
         this.bookSourceShowList.forEach(v => {
           v.bookSourceGroup && groups.add(v.bookSourceGroup);
         });
-        groups.add("未分组");
+        groups.add("ungrouped");
         return Array.from(groups);
       } else {
         return [].concat(errorTypeList).concat(["timeout"]);
@@ -2912,7 +3045,7 @@ export default {
         );
       } else {
         return this.bookSourceShowList.filter(v =>
-          this.showSourceGroup === "未分组"
+          this.showSourceGroup === "ungrouped"
             ? !v.bookSourceGroup
             : v.bookSourceGroup === this.showSourceGroup
         );
@@ -2991,12 +3124,12 @@ export default {
       } else {
         // epub
         return [
-          { name: "根据 Spin 获取章节，使用 Toc 补充章节名", rule: "spin+toc" },
-          { name: "根据 Spin 获取章节，强制使用 Toc 章节名", rule: "spin<toc" },
-          { name: "根据 Spin 获取章节", rule: "spin" },
-          { name: "根据 Toc 获取章节，使用 Spin 补充章节名", rule: "toc+spin" },
-          { name: "根据 Toc 获取章节，强制使用 Spin 章节名", rule: "toc<spin" },
-          { name: "根据 Toc 获取章节", rule: "toc" }
+          { name: this.$t("catalog.rule.spin+toc"), rule: "spin+toc" },
+          { name: this.$t("catalog.rule.spin<toc"), rule: "spin<toc" },
+          { name: this.$t("catalog.rule.spin"), rule: "spin" },
+          { name: this.$t("catalog.rule.toc+spin"), rule: "toc+spin" },
+          { name: this.$t("catalog.rule.toc<spin"), rule: "toc<spin" },
+          { name: this.$t("catalog.rule.toc"), rule: "toc" }
         ];
       }
     }
