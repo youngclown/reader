@@ -2,7 +2,7 @@
 import { Message, MessageBox } from "element-ui";
 import { errorTypeList } from "./config";
 import store from "./vuex";
-import { t } from "./i18n";
+import { t, translateBackendMessage } from "./i18n";
 
 const service = Axios.create({
   baseURL: store.getters.api,
@@ -92,7 +92,11 @@ export const request = async ({
         if (!isShowLoginTip) {
           isShowLoginTip = true;
           setTimeout(() => {
-            errorMsg && Message.error({ message: errorMsg, duration: 2000 });
+            errorMsg &&
+              Message.error({
+                message: translateBackendMessage(errorMsg),
+                duration: 2000
+              });
             setTimeout(() => {
               isShowLoginTip = false;
             }, 2000);
@@ -134,12 +138,21 @@ export const request = async ({
           }
         }
         if (!options.silent) {
-          errorMsg && Message.error({ message: errorMsg, duration: 2000 });
+          errorMsg &&
+            Message.error({
+              message: translateBackendMessage(errorMsg),
+              duration: 2000
+            });
         }
         break;
     }
   } else {
-    alert && errorMsg && Message.success({ message: errorMsg, duration: 1500 });
+    alert &&
+      errorMsg &&
+      Message.success({
+        message: translateBackendMessage(errorMsg),
+        duration: 1500
+      });
   }
 
   return response;

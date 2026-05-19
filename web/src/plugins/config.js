@@ -144,8 +144,8 @@ const defaultNightConfig = {
 
 const defaultLocale =
   typeof localStorage !== "undefined"
-    ? localStorage.getItem("reader_locale") || "zh"
-    : "zh";
+    ? localStorage.getItem("reader_locale") || "en"
+    : "en";
 
 const settings = {
   shelfConfig: {

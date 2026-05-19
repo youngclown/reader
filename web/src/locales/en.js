@@ -166,6 +166,8 @@
     bookUrlRequired: "Book URL is required",
     bookOriginRequired: "Book source is required",
     bookJsonRequired: "Book info must be JSON",
+    bookFileSelectedAsSource:
+      "This is a book file. Import it from Settings > Shelf Settings > Import Books.",
     sourceFileError: "{type} file error",
     sourceFileReadFailed: "Failed to read {type} file {message}",
     remoteSourcePrompt: "Enter remote source URL",
@@ -602,5 +604,27 @@
     loading: "Loading",
     loadMore: "Load More",
     jumpLastPosition: "Jump to Last Position"
+  },
+  backendErrors: {
+    localBookSourceFileMissing: "The local book source file does not exist",
+    localSourceBookFileMissing: "The local source book file does not exist",
+    chapterNotFound: "Chapter does not exist",
+    localStoreBookMissing: "The local store book file does not exist",
+    webdavStoreBookMissing: "The WebDAV store book file does not exist",
+    bookNotFound: "Book does not exist",
+    uploadedBookMissing: "The uploaded book file does not exist",
+    importLocalBookFailed: "Failed to import local book",
+    importLocalEpubFailed: "Failed to import local EPUB book",
+    importLocalCbzFailed: "Failed to import local CBZ book",
+    shelfBookMissing: "The shelf book does not exist",
+    pathNotFound: "Path does not exist",
+    webdavDisabled: "WebDAV is not enabled",
+    localStoreDisabled: "Local store is not enabled",
+    bookInfoLoadFailed: "Failed to load book info",
+    chapterUrlLoadFailed: "Failed to load chapter URL",
+    chapterInfoLoadFailed: "Failed to load chapter info",
+    epubExtractFailed: "Failed to extract EPUB book",
+    chapterFileMissing: "Chapter file does not exist",
+    chapterContentLoadFailed: "Failed to load chapter content"
   }
 };

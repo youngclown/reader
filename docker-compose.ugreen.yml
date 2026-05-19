@@ -1,0 +1,33 @@
+services:
+  reader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: reader-ko:latest
+    container_name: reader-ko
+    restart: unless-stopped
+    ports:
+      - "4396:8080"
+    volumes:
+      - ./ugreen-data/storage:/storage
+      - ./ugreen-data/logs:/logs
+    environment:
+      TZ: Asia/Seoul
+      SPRING_PROFILES_ACTIVE: prod
+      READER_APP_STORAGEPATH: /storage
+      LOGGING_PATH: /logs
+      READER_APP_CACHECHAPTERCONTENT: "true"
+      READER_APP_USERBOOKLIMIT: "200"
+      READER_APP_SECURE: "true"
+      READER_APP_SECUREKEY: "change-this-admin-password"
+      READER_APP_INVITECODE: "change-this-invite-code"
+      JAVA_OPTS: "-Xms128m -Xmx512m"
+
+  readerwebview:
+    image: hectorqin/remote-webview:latest
+    container_name: reader-webview
+    restart: unless-stopped
+    profiles:
+      - webview
+    environment:
+      TZ: Asia/Seoul

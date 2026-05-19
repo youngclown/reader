@@ -58,7 +58,8 @@ export default {
     checking: "正在",
     addSuccess: "添加成功",
     addFailed: "添加失败 {message}",
-    editor: "编辑器"
+    editor: "编辑器",
+    logoutFailed: "注销失败 {message}"
   },
   auth: {
     inviteCode: "邀请码(没有则不填)",
@@ -68,8 +69,7 @@ export default {
     secureKeyPrompt: "请输入管理密码后继续操作",
     addUser: "新增用户",
     addSuccess: "新增成功",
-    addFailed: "新增失败 {message}",
-    logoutFailed: "注销失败 {message}"
+    addFailed: "新增失败 {message}"
   },
   time: {
     justNow: "刚刚",
@@ -165,6 +165,8 @@ export default {
     bookUrlRequired: "书籍链接不能为空",
     bookOriginRequired: "书籍来源不能为空",
     bookJsonRequired: "书籍信息必须是JSON格式",
+    bookFileSelectedAsSource:
+      "这是书籍文件，请从 设置 > 书架设置 > 导入书籍 导入。",
     sourceFileError: "{type}文件错误",
     sourceFileReadFailed: "读取{type}文件内容失败 {message}",
     remoteSourcePrompt: "请输入远程书源链接",
@@ -592,5 +594,27 @@ export default {
     loading: "加载中",
     loadMore: "加载更多",
     jumpLastPosition: "跳转上次位置"
+  },
+  backendErrors: {
+    localBookSourceFileMissing: "本地书籍源文件不存在",
+    localSourceBookFileMissing: "本地源书籍文件不存在",
+    chapterNotFound: "章节不存在",
+    localStoreBookMissing: "本地书仓书籍不存在",
+    webdavStoreBookMissing: "webdav书仓书籍不存在",
+    bookNotFound: "书籍不存在",
+    uploadedBookMissing: "上传书籍不存在",
+    importLocalBookFailed: "导入本地书籍失败",
+    importLocalEpubFailed: "导入本地Epub书籍失败",
+    importLocalCbzFailed: "导入本地CBZ书籍失败",
+    shelfBookMissing: "书架书籍不存在",
+    pathNotFound: "路径不存在",
+    webdavDisabled: "未开启webdav功能",
+    localStoreDisabled: "未开启本地书仓功能",
+    bookInfoLoadFailed: "获取书籍信息失败",
+    chapterUrlLoadFailed: "获取章节链接失败",
+    chapterInfoLoadFailed: "获取章节信息失败",
+    epubExtractFailed: "Epub书籍解压失败",
+    chapterFileMissing: "章节文件不存在",
+    chapterContentLoadFailed: "获取章节内容失败"
   }
 };

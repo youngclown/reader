@@ -228,6 +228,7 @@
             <input
               ref="fileRef"
               type="file"
+              accept=".json,.txt"
               @change="onSourceFileChange"
               style="display:none"
             />
@@ -265,6 +266,7 @@
             <input
               ref="bookRef"
               type="file"
+              accept=".txt,.epub,.umd"
               multiple="multiple"
               @change="onBookFileChange"
               style="display:none"
@@ -1755,6 +1757,15 @@ export default {
     },
     onSourceFileChange(event, isRssSource) {
       const rawFile = event.target.files && event.target.files[0];
+      if (
+        rawFile &&
+        /\.(epub|umd)$/i.test(rawFile.name) &&
+        !/\.json$/i.test(rawFile.name)
+      ) {
+        this.$message.error(this.$t("source.bookFileSelectedAsSource"));
+        this.$refs.fileRef.value = null;
+        return;
+      }
       // console.log("rawFile", rawFile);
       const reader = new FileReader();
       const sourceTypeName = isRssSource
@@ -2576,7 +2587,8 @@ export default {
               JSON.stringify(res.data.data || [], null, 4)
             ]);
 
-            aEle.download = "reader-sources-" + this.currentDateTime() + ".json";
+            aEle.download =
+              "reader-sources-" + this.currentDateTime() + ".json";
             aEle.href = URL.createObjectURL(blob);
             aEle.click();
           }

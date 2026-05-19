@@ -165,6 +165,8 @@
     bookUrlRequired: "책 링크를 입력하세요",
     bookOriginRequired: "책 출처를 입력하세요",
     bookJsonRequired: "책 정보는 JSON 형식이어야 합니다",
+    bookFileSelectedAsSource:
+      "책 파일입니다. 설정 > 책장 설정 > 책 가져오기에서 가져오세요.",
     sourceFileError: "{type} 파일 오류",
     sourceFileReadFailed: "{type} 파일 내용 읽기 실패 {message}",
     remoteSourcePrompt: "원격 책 소스 링크를 입력하세요",
@@ -600,5 +602,27 @@
     loading: "불러오는 중",
     loadMore: "더 불러오기",
     jumpLastPosition: "이전 위치로 이동"
+  },
+  backendErrors: {
+    localBookSourceFileMissing: "로컬 책 원본 파일이 없습니다",
+    localSourceBookFileMissing: "로컬 원본 책 파일이 없습니다",
+    chapterNotFound: "챕터가 없습니다",
+    localStoreBookMissing: "로컬 책 창고의 책 파일이 없습니다",
+    webdavStoreBookMissing: "WebDAV 책 창고의 책 파일이 없습니다",
+    bookNotFound: "책이 없습니다",
+    uploadedBookMissing: "업로드한 책 파일이 없습니다",
+    importLocalBookFailed: "로컬 책 가져오기에 실패했습니다",
+    importLocalEpubFailed: "로컬 EPUB 책 가져오기에 실패했습니다",
+    importLocalCbzFailed: "로컬 CBZ 책 가져오기에 실패했습니다",
+    shelfBookMissing: "책장에 해당 책이 없습니다",
+    pathNotFound: "경로가 없습니다",
+    webdavDisabled: "WebDAV 기능이 켜져 있지 않습니다",
+    localStoreDisabled: "로컬 책 창고 기능이 켜져 있지 않습니다",
+    bookInfoLoadFailed: "책 정보를 가져오지 못했습니다",
+    chapterUrlLoadFailed: "챕터 링크를 가져오지 못했습니다",
+    chapterInfoLoadFailed: "챕터 정보를 가져오지 못했습니다",
+    epubExtractFailed: "EPUB 책 압축 해제에 실패했습니다",
+    chapterFileMissing: "챕터 파일이 없습니다",
+    chapterContentLoadFailed: "챕터 내용을 가져오지 못했습니다"
   }
 };

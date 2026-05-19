@@ -1,4 +1,6 @@
 HELP.md
+.git
+.github
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -44,4 +46,8 @@ out
 /bin
 /file-uploads
 node_modules
+web/dist
+web/node_modules
+ugreen-data
+*.tar
 /reader-assets
